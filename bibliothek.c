@@ -63,28 +63,47 @@ int set_cursor(const int x, const int y)
 int move_cursor()
 {
     int set_cursor(const int x, const int y);
+    //Startposition definieren
     set_cursor(2, 1);
-    int current_cursor_position_x = 21;
+    int current_cursor_position_x = 2;
     int current_cursor_position_y = 1;
 
     while(1)
     {
         //Keycode-Quelle: "https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-6.0/aa299374(v=vs.60)"
+        //Abfangen der Pfeiltasteneingaben
+        //Cursorbewegung wird auf das Spielfeld begrenzt
         switch(_getch())
         {
         case 72:
+            if (current_cursor_position_y <= 1)
+            {
+                break;
+            }
             current_cursor_position_y -= 1;
             set_cursor(current_cursor_position_x, current_cursor_position_y);
             break;
         case 80:
+            if (current_cursor_position_y >= 11)
+            {
+                break;
+            }
             current_cursor_position_y += 1;
             set_cursor(current_cursor_position_x, current_cursor_position_y);
             break;
         case 77:
+            if (current_cursor_position_x >= 22)
+            {
+                break;
+            }
             current_cursor_position_x += 1;
             set_cursor(current_cursor_position_x, current_cursor_position_y);
             break;
         case 75:
+            if (current_cursor_position_x<=2)
+            {
+                break;
+            }
             current_cursor_position_x -= 1;
             set_cursor(current_cursor_position_x, current_cursor_position_y);
             break;
