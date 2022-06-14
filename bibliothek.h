@@ -8,5 +8,8 @@ int move_cursor();
 int set_cursor(const int x, const int y);
 int level_anzeige (int level_aufbau[9][9]);
 int sodoku_level(int level);
+int* null_festellen(int level_neu[9][9]);
+int sudoku_voll (int level_bearbeitet[9][9]);
+int sudoku_geloest (int level_bearbeitet[9][9], int level_loesung[9][9]);
 
 #endif // BIBLIOTHEK_H_INCLUDED
