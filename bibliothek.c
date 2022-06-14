@@ -10,10 +10,10 @@
  * mit den "0-Feldern" (schreibbare Felder) abgeglichen werden. Nur dann darf in ein Array
  * geschrieben werden (vlt. ein neues Array anlegen).
  * Die Nullfelder ergeben sich aus der Formatierung in "level_anzeige()" (am besten eigene Funktion
- * für Nullfelder schreiben damit ein einfacher Abruf zum Vergleich stattfinden kann):
+ * fÃ¼r Nullfelder schreiben damit ein einfacher Abruf zum Vergleich stattfinden kann):
  *  +1y , erste Zeile besteht aus Trennern
  *  erste 3 Zahlen liegen in (2,1)(4,1)(6,1), dann wegen des Trenners in (10,1)(12,1)(14,1) und in (18,1)(20,1)(22,1) usw.
- *  bis zur dritten Zeile setzt sich das für y jeweils mit +1 fort
+ *  bis zur dritten Zeile setzt sich das fÃ¼r y jeweils mit +1 fort
  *  dann aufgrund des Trenners y+=2
 **/
 
@@ -55,8 +55,8 @@ int set_cursor(const int x, const int y)
 
 
 /**
- * main-Funktion aus CursorKeys (von Herrn Wichmann) übernommen und leicht angepasst.
- * getch() fängt Tastatureingaben ab und reagiert auf Pfeiltasten,
+ * main-Funktion aus CursorKeys (von Herrn Wichmann) Ã¼bernommen und leicht angepasst.
+ * getch() fÃ¤ngt Tastatureingaben ab und reagiert auf Pfeiltasten,
  * ruft bei entsprechendem Event set_cursor auf und speichert
  * aktuelle Cursorposition in current_cursor_position x oder y.
 **/
@@ -138,7 +138,7 @@ int level_anzeige(int level_aufbau[9][9])
     int i, j, k;
     for (k=0; k<9; k++)
     {
-        //Trenner am Anfang und jeweils nach drei Zahlen einfügen (spaltenweise)
+        //Trenner am Anfang und jeweils nach drei Zahlen einfÃ¼gen (spaltenweise)
         if (k==0 || k==3 || k==6)
         {
             printf("+");
@@ -148,12 +148,12 @@ int level_anzeige(int level_aufbau[9][9])
             }
             printf("\n");
         }
-        //Beginn die nächste Zeile mit "| "
+        //Beginn die nÃ¤chste Zeile mit "| "
         printf("| ");
 
         for (i=0; i<9; i++)
         {
-            //Trenner nach drei Zahlen einfügen (zeilenweise)
+            //Trenner nach drei Zahlen einfÃ¼gen (zeilenweise)
             if (i==3 || i==6)
             {
                 printf("| ");
@@ -163,7 +163,7 @@ int level_anzeige(int level_aufbau[9][9])
             {
                 printf(". ");
             }
-            //Sonst Zahlenwerte einfügen
+            //Sonst Zahlenwerte einfÃ¼gen
             else
             {
                 printf("%d ", level_aufbau[k][i]);
@@ -223,5 +223,55 @@ int sodoku_level(int level)
     {
 
     }
+}
+
+int* null_festellen(int level_neu[9][9])
+{
+    int index = 0;
+    int coords[162]= {0};
+    for(int i=0; i<9; i++)
+    {
+        for (int j; j<9; i++)
+        {
+            if(level_neu[i][j]!=0)
+            {
+               coords[index]=i;
+               index+=1;
+               coords[index]=j;
+               index+=1;
+            }
+        }
+    }
+    return coords;
+}
+
+int sudoku_voll (int level_bearbeitet[9][9])
+{
+   for(int i=0; i<9; i++)
+    {
+        for (int j; j<9; i++)
+        {
+            if(level_bearbeitet[i][j]==0)
+            {
+               return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+int sudoku_geloest (int level_bearbeitet[9][9], int level_loesung[9][9])
+{
+   for(int i=0; i<9; i++)
+    {
+        for (int j; j<9; i++)
+        {
+            if(level_bearbeitet[i][j]!=level_loesung[i][j])
+            {
+               return 0;
+            }
+        }
+    }
+    return 1;
 }
 
