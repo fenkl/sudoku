@@ -275,3 +275,39 @@ int sudoku_geloest (int level_bearbeitet[9][9], int level_loesung[9][9])
     return 1;
 }
 
+int* koordinaten_umrechnen(int x, int y, int ausgabe_zu_array)
+{
+    if (ausgabe_zu_array == 1)
+    {
+        if(x<7){x= x/2-1;}
+
+            else if (x<15){x=x/2-2;}
+
+                else if(x<23){x= x/2-3;}
+
+        if(y<4){y=y-1;}
+
+            else if(y<8){y=y-2;}
+
+                else if(y<12){y=y-3;}
+
+    }
+    else if (ausgabe_zu_array ==0)
+    {
+        if(x<3){x=(x+1)*2;}
+
+            else if(x<6){x=(x+2)*2;}
+
+                else if(x<9){x=(x+3)*2;}
+
+        if(y<3){y=y+1;}
+
+            else if(y<6){y=y-2;}
+
+                else if(y<9){y=y-3;}
+    }
+
+    int coords[2]={x,y};
+
+    return coords;
+}
