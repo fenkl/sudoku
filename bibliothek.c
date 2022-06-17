@@ -6,42 +6,70 @@
 
 
 /**
- * Die Nullfelder ergeben sich aus der Formatierung in "level_anzeige()":
- *  +1y , erste Zeile besteht aus Trennern
- *  erste 3 Zahlen liegen in (2,1)(4,1)(6,1), dann wegen des Trenners in (10,1)(12,1)(14,1) und in (18,1)(20,1)(22,1) usw.
- *  bis zur dritten Zeile setzt sich das für y jeweils mit +1 fort
- *  dann aufgrund des Trenners y+=2
- * \param Index des zweidimensionalen Arrays
-**/
-/*
-//81 Zahlen müssen in x und y untergebracht werden, alle Werte zunächst auf 0 setzen
-int null_y[81];
-int null_x[81];
-//Indexzähler für Anhängen von Werten an den richtigen Stellen
-int null_y_index = 0;
-int null_x_index = 0;
-
-int nullfelder(int array_y, int array_x)
+  *
+  *Methode gibt 1 zurÃ¼ck, wenn die Ã¼bergebene Koordinate beabeitet werden darf und 0 wenn nicht
+  *
+  **/
+int IsThisCoordinateTheCoordinateOfANumber (int x, int y, int sudoku[9][9])
 {
-    //printf("%i", array_y);
+    // 2 Arrays fÃ¼r die Abbildung der erlaubten x und y Koordinaten
+    int null_x[9] = {2,4,6,10,12,14,18,20,22};
+    int null_y[9] = {1,2,3,5,6,7,9,10,11};
 
-    if (array_y <= 2)
-    {
-        null_y[null_y_index] = array_y + 1;
-        //printf("%d", null_y[null_y_index]);
-        null_y_index += 1;
-    }
-    else if (array_y >= 3 && array_y <= 5)
-    {
-        null_y[null_y_index] = array_y + 2;
-        //printf("%d", null_y[null_y_index]);
-        null_y_index += 1;
-    }
+    int yField = 20;
+    yField = IsNumberInArray(null_x, x);
+    int xField = 20;
+    xField = IsNumberInArray(null_y, y);
 
-    printf("%d", null_y[null_y_index]);
+
+    if (yField != -1 && xField != -1)
+    {
+        if(sudoku[xField][yField]==0)
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    else
+    {
+        return 0;
+    }
 }
 
-*/
+int IsNumberInArray(int array[9], int number)
+{
+    for(int i = 0; i <= 8; i++)
+    {
+        if(array[i] == number)
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+/**
+  *
+  * ÃœberprÃ¼fung, ob die Ã¼bergebene Zahl eine Zahl zwischen 1 und 9 ist
+  * Wenn "Ja" wird die eingegebene Zahl zurÃ¼ckgegeben,
+  * Wenn "Nein" wird 0 zurÃ¼ckgegeben
+  *
+  **/
+int CorrectInput (int number)
+{
+    if (number > 0 && number < 10)
+    {
+        return number;
+    }
+    else
+    {
+        return 0;
+    }
+}
 
 
 /**
@@ -82,8 +110,8 @@ int set_cursor(const int x, const int y)
 
 
 /**
- * main-Funktion aus CursorKeys (von Herrn Wichmann) übernommen und leicht angepasst.
- * getch() fängt Tastatureingaben ab und reagiert auf Pfeiltasten,
+ * main-Funktion aus CursorKeys (von Herrn Wichmann) Ã¼bernommen und leicht angepasst.
+ * getch() fÃ¤ngt Tastatureingaben ab und reagiert auf Pfeiltasten,
  * ruft bei entsprechendem Event set_cursor auf und speichert
  * aktuelle Cursorposition in current_cursor_position x oder y.
 **/
@@ -144,7 +172,7 @@ int level_anzeige(int level_aufbau[9][9])
     int i, j, k;
     for (k=0; k<9; k++)
     {
-        //Trenner am Anfang und jeweils nach drei Zahlen einfügen (spaltenweise)
+        //Trenner am Anfang und jeweils nach drei Zahlen einfÃ¼gen (spaltenweise)
         if (k==0 || k==3 || k==6)
         {
             printf("+");
@@ -154,12 +182,12 @@ int level_anzeige(int level_aufbau[9][9])
             }
             printf("\n");
         }
-        //Beginn die nächste Zeile mit "| "
+        //Beginn die nÃ¤chste Zeile mit "| "
         printf("| ");
 
         for (i=0; i<9; i++)
         {
-            //Trenner nach drei Zahlen einfügen (zeilenweise)
+            //Trenner nach drei Zahlen einfÃ¼gen (zeilenweise)
             if (i==3 || i==6)
             {
                 printf("| ");
@@ -171,7 +199,7 @@ int level_anzeige(int level_aufbau[9][9])
                 //Nullfelder abspeichern
                 //nullfelder(k,i);
             }
-            //Sonst Zahlenwerte einfügen
+            //Sonst Zahlenwerte einfÃ¼gen
             else
             {
                 printf("%d ", level_aufbau[k][i]);
@@ -192,8 +220,8 @@ int level_anzeige(int level_aufbau[9][9])
 
 /**
  * Erstellung des "Sudoku-Arrays"
- * \param level = ausgewähltes Level
- * Funktion als Zeiger und int als static, da zweidimensionale Arrays sonst nicht mehr zurück an main gegeben werden können
+ * \param level = ausgewÃ¤hltes Level
+ * Funktion als Zeiger und int als static, da zweidimensionale Arrays sonst nicht mehr zurÃ¼ck an main gegeben werden kÃ¶nnen
  * Quelle: https://www.tutorialspoint.com/cprogramming/c_return_arrays_from_function.htm
  * \return aufbau Sudoku als Array
 */
