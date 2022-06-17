@@ -5,6 +5,7 @@
 #define BIBLIOTHEK_H_INCLUDED
 
 //int nullfelder(int array_y, int array_x);
+int Difficulty();
 int move_cursor();
 int set_cursor(const int x, const int y);
 int level_anzeige (int level_aufbau[9][9]);

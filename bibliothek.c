@@ -6,42 +6,40 @@
 
 
 /**
- * Die Nullfelder ergeben sich aus der Formatierung in "level_anzeige()":
- *  +1y , erste Zeile besteht aus Trennern
- *  erste 3 Zahlen liegen in (2,1)(4,1)(6,1), dann wegen des Trenners in (10,1)(12,1)(14,1) und in (18,1)(20,1)(22,1) usw.
- *  bis zur dritten Zeile setzt sich das für y jeweils mit +1 fort
- *  dann aufgrund des Trenners y+=2
- * \param Index des zweidimensionalen Arrays
-**/
-/*
-//81 Zahlen müssen in x und y untergebracht werden, alle Werte zunächst auf 0 setzen
-int null_y[81];
-int null_x[81];
-//Indexzähler für Anhängen von Werten an den richtigen Stellen
-int null_y_index = 0;
-int null_x_index = 0;
-
-int nullfelder(int array_y, int array_x)
+  *
+  * Abfrage, welcher Schwierigkeitsgrad gespielt werden möchte
+  * Gibt einen Integer von 1 bis 3 zurück
+  */
+int Difficulty()
 {
-    //printf("%i", array_y);
+    int difficulty_input = 0;
+    int input_accepted = 0;
 
-    if (array_y <= 2)
-    {
-        null_y[null_y_index] = array_y + 1;
-        //printf("%d", null_y[null_y_index]);
-        null_y_index += 1;
-    }
-    else if (array_y >= 3 && array_y <= 5)
-    {
-        null_y[null_y_index] = array_y + 2;
-        //printf("%d", null_y[null_y_index]);
-        null_y_index += 1;
-    }
+    printf("Welches Schwierigkeitslevel moechten Sie spielen?");
+    printf("\n (1) Einfach");
+    printf("\n (2) Normal");
+    printf("\n (3) Schwer");
 
-    printf("%d", null_y[null_y_index]);
+    while (input_accepted== 0)
+    {
+        printf("\n\nSchwierigkeit: ");
+
+        scanf("%d", &difficulty_input);
+        fflush(stdin);
+
+        if (difficulty_input > 0 && difficulty_input< 4)
+        {
+            input_accepted = 1;
+            return difficulty_input;
+        }
+        else
+        {
+            difficulty_input = 0;
+            input_accepted = 0;
+            printf("\nBitte geben Sie eine Zahl von 1 - 3 ein");
+        }
+    }
 }
-
-*/
 
 
 /**
@@ -93,46 +91,54 @@ int move_cursor()
     set_cursor(2, 1);
     int current_cursor_position_x = 2;
     int current_cursor_position_y = 1;
+    char number_pressed;
 
     while(1)
     {
         //Keycode-Quelle: "https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-6.0/aa299374(v=vs.60)"
-        //Abfangen der Pfeiltasteneingaben
+        //Abfangen der Tastatureingaben
         //Cursorbewegung wird auf das Spielfeld begrenzt
-        switch(_getch())
+        int key_pressed = _getch();
+        switch(key_pressed)
         {
-        case 72:
-            if (current_cursor_position_y <= 1)
-            {
+            //Abfangen der Zahlen
+            case 49 ... 57:
+                number_pressed = key_pressed;
+                printf("%c", number_pressed);
+                set_cursor(current_cursor_position_x, current_cursor_position_y);
+            //Abfangen der cursor
+            case 72:
+                if (current_cursor_position_y <= 1)
+                {
+                    break;
+                }
+                current_cursor_position_y -= 1;
+                set_cursor(current_cursor_position_x, current_cursor_position_y);
                 break;
-            }
-            current_cursor_position_y -= 1;
-            set_cursor(current_cursor_position_x, current_cursor_position_y);
-            break;
-        case 80:
-            if (current_cursor_position_y >= 11)
-            {
+            case 80:
+                if (current_cursor_position_y >= 11)
+                {
+                    break;
+                }
+                current_cursor_position_y += 1;
+                set_cursor(current_cursor_position_x, current_cursor_position_y);
                 break;
-            }
-            current_cursor_position_y += 1;
-            set_cursor(current_cursor_position_x, current_cursor_position_y);
-            break;
-        case 77:
-            if (current_cursor_position_x >= 22)
-            {
+            case 77:
+                if (current_cursor_position_x >= 22)
+                {
+                    break;
+                }
+                current_cursor_position_x += 1;
+                set_cursor(current_cursor_position_x, current_cursor_position_y);
                 break;
-            }
-            current_cursor_position_x += 1;
-            set_cursor(current_cursor_position_x, current_cursor_position_y);
-            break;
-        case 75:
-            if (current_cursor_position_x<=2)
-            {
+            case 75:
+                if (current_cursor_position_x<=2)
+                {
+                    break;
+                }
+                current_cursor_position_x -= 1;
+                set_cursor(current_cursor_position_x, current_cursor_position_y);
                 break;
-            }
-            current_cursor_position_x -= 1;
-            set_cursor(current_cursor_position_x, current_cursor_position_y);
-            break;
         }
     }
     return 0;
@@ -230,7 +236,7 @@ int *sodoku_level(int level)
     }
     else if (level == 2)
     {
-
+        //static int loesung
     }
     else if (level == 3)
     {
