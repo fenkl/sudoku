@@ -77,6 +77,55 @@ int set_cursor(const int x, const int y)
     return return_value;
 }
 
+/**
+  *
+  *Methode gibt 1 zurück, wenn die übergebene Koordinate beabeitet werden darf und 0 wenn nicht
+  *
+  **/
+int *check_writable_field (int x, int y, int sudoku[9][9])
+{
+    // 2 Arrays für die Abbildung der erlaubten x und y Koordinaten
+    int null_x[9] = {2,4,6,10,12,14,18,20,22};
+    int null_y[9] = {1,2,3,5,6,7,9,10,11};
+
+    int yField;
+    yField = IsNumberInArray(null_x, x);
+    int xField;
+    xField = IsNumberInArray(null_y, y);
+
+    static int writable_fields[2];
+    if (yField != -1 && xField != -1)
+    {
+        if(sudoku[xField][yField]==0)
+        {
+            writable_fields[0] = xField;
+            writable_fields[1] = yField;
+            return writable_fields;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+
+int IsNumberInArray(int array[9], int number)
+{
+    for(int i = 0; i <= 8; i++)
+    {
+        if(array[i] == number)
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
 
 
 /**
@@ -85,12 +134,12 @@ int set_cursor(const int x, const int y)
  * ruft bei entsprechendem Event set_cursor auf und speichert
  * aktuelle Cursorposition in current_cursor_position x oder y.
 **/
-int move_cursor()
+int *move_cursor(int set_cursor_position_x, int set_cursor_position_y)
 {
     //Startposition definieren
-    set_cursor(2, 1);
-    int current_cursor_position_x = 2;
-    int current_cursor_position_y = 1;
+    set_cursor(set_cursor_position_x, set_cursor_position_y);
+    int current_cursor_position_x = set_cursor_position_x;
+    int current_cursor_position_y = set_cursor_position_y;
     char number_pressed;
 
     while(1)
@@ -104,7 +153,12 @@ int move_cursor()
             //Abfangen der Zahlen
             case 49 ... 57:
                 number_pressed = key_pressed;
-                printf("%c", number_pressed);
+                // Array zur Rückgabe der Werte füllen
+                static int pressed_number_and_cursor_positions[3];
+                pressed_number_and_cursor_positions[0] = key_pressed;
+                pressed_number_and_cursor_positions[1] = current_cursor_position_x;
+                pressed_number_and_cursor_positions[2] = current_cursor_position_y;
+                return pressed_number_and_cursor_positions;
                 set_cursor(current_cursor_position_x, current_cursor_position_y);
             //Abfangen der cursor
             case 72:
