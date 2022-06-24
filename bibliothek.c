@@ -182,8 +182,7 @@ int *move_cursor(int set_cursor_position_x, int set_cursor_position_y)
             //Abfangen der cursor
             case 13:
                 //
-                pressed_number_and_cursor_positions[0] = key_pressed;
-                return pressed_number_and_cursor_positions;
+                return 13;
 
             case 72:
                 if (current_cursor_position_y <= 1)
