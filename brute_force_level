@@ -1,0 +1,418 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <time.h>
+
+// Funktionsprototypen
+struct variablen init_variablen();
+int setup_groups(struct variablen variable, int type_of_group);
+int define_group(struct variablen variable, int group_number);
+int get_random_number(int number_array[9]);
+int reset_group(struct variablen variable, int group_number);
+int IsNumberInRow(struct variablen variable, int blockid, int innerrow, int number);
+int IsNumberInCol(struct variablen variable, int blockid, int innercol, int number);
+int ausgabe_felder(struct variablen variable);
+
+
+
+
+struct variablen {
+    int nine_niner_fields[9][3][3];
+    int numbers[9];
+    int proofrow[9][3];
+    int proofcol[9][3];
+    int reset_count;
+    int max_group_reset;
+    int initial_groups[3];
+    int rest_of_groups[6];
+    int try_counter;
+};
+
+
+struct variablen init_variablen()
+{
+
+    struct variablen variable;
+
+    variable.initial_groups[0] = 0; variable.initial_groups[1] = 4; variable.initial_groups[2] = 8;
+    variable.try_counter = 0;
+    variable.reset_count = 0;
+    variable.max_group_reset = 9;
+
+    for (int i=0; i<9; i++)
+    {
+        for (int j=0; j<3; j++)
+        {
+            for (int h=0; h<3; h++)
+            {
+                variable.nine_niner_fields[i][j][h] = 0;
+            }
+        }
+    }
+
+
+    for (int i=0; i<9; i++)
+    {
+        int x = i + 1;
+        variable.numbers[i] = x;
+        //printf("numbers: %i\n", variable.numbers[i]);
+
+    }
+
+    for (int j=0; j<9; j++)
+    {
+        if (j>=0 && j<=2)
+        {
+            for (int h=0; h<3; h++)
+            {
+                variable.proofrow[j][h] = h;
+                //printf("\n%i", proofrow[j][h]);
+            }
+        }
+        else if (j>=3 && j<=5)
+        {
+            for (int h=0; h<3; h++)
+            {
+                variable.proofrow[j][h] = h + 3;
+                //printf("\n%i", proofrow[j][h]);
+
+            }
+        }
+        else if (j>=6 && j<=8)
+        {
+            for (int h=0; h<3; h++)
+            {
+                variable.proofrow[j][h] = h + 6;
+                //printf("\n%i", proofrow[j][h]);
+
+            }
+        }
+    }
+
+    for (int j=0; j<9; j++)
+    {
+        if (j==0 || j==3 || j==6)
+        {
+            variable.proofcol[j][0] = 0;
+            variable.proofcol[j][1] = 3;
+            variable.proofcol[j][2] = 6;
+        }
+        else if (j==1 || j==4 || j==7)
+        {
+            variable.proofcol[j][0] = 1;
+            variable.proofcol[j][1] = 4;
+            variable.proofcol[j][2] = 8;
+        }
+
+        else if (j==2 || j==5 || j==8)
+        {
+            variable.proofcol[j][0] = 2;
+            variable.proofcol[j][1] = 5;
+            variable.proofcol[j][2] = 8;
+        }
+    }
+
+
+    for (int j=0; j<6; j++)
+    {
+        if (j>=0 && j<=2)
+        {
+            variable.rest_of_groups[j] = j + 1;
+        }
+        else
+        {
+            variable.rest_of_groups[j] = j + 2;
+        }
+        //printf("%i", rest_of_groups[j]);
+    }
+
+    return variable;
+}
+
+
+int setup_groups(struct variablen variable, int type_of_group)
+{
+    //printf("%i", variable.initial_groups[0]);
+
+    int groups[6];
+
+    int length_groups;
+    //printf("%i\n", type_of_group);
+    if (type_of_group == 1)
+    {
+        length_groups = 3;
+        for (int i=0; i<3; i++)
+        {
+            groups[i] = variable.initial_groups[i];
+            //printf("%i", groups[i]);
+        }
+        //printf("%i", groups[0]);
+    }
+    else
+    {
+        length_groups = 6;
+        for (int i=0; i<6; i++)
+        {
+            groups[i] = variable.rest_of_groups[i];
+            //printf("rest:%i", groups[i]);
+
+        }
+    }
+
+    int list_pointer = 0;
+    while (list_pointer < length_groups)
+    {
+        int group = groups[list_pointer];
+
+        int group_reset_result = define_group(variable, group);
+        printf("%i\n", group_reset_result);
+        //done = 1
+        if (group_reset_result == 1)
+        {
+            list_pointer += 1;
+        }
+        //reset = 0
+        else if (group_reset_result == 0)
+        {
+            variable.reset_count += 1;
+            if (variable.reset_count >= variable.max_group_reset)
+            {
+                variable.reset_count = 0;
+                //reset_group(group);
+                list_pointer = 0;
+            }
+            else
+            {
+
+            }
+        }
+        else
+        {
+            printf("in else");
+            list_pointer = 0;
+            variable.reset_count = 0;
+        }
+
+    }
+    return 0;
+}
+
+
+
+int define_group(struct variablen variable, int group_number)
+{
+
+    variable.try_counter += 1;
+
+    int copy_of_numbers[9];
+
+    //copy of numbers füllen
+    for (int j=0; j<9; j++)
+    {
+        copy_of_numbers[j] = variable.numbers[j];
+        //printf("copy: %i\n", copy_of_numbers[j]);
+    }
+
+    for (int row=0; row<3; row++)
+    {
+        for (int col=0; col<3; col++)
+        {
+            int inner_copy_of_numbers[9];
+            int length_inner_copy_of_numbers = 9;
+            //printf("%i", length_inner_copy_of_numbers);
+            for (int i=0; i<9; i++)
+            {
+                inner_copy_of_numbers[i] = copy_of_numbers[i];
+            }
+
+            int guessed_number;
+            //wenn copy_of_numbers nicht guessed_number enthält, erneut zufällige Zahl suchen
+            do
+            {
+                guessed_number = get_random_number(copy_of_numbers);
+                //printf("guessed 1: %i\n", guessed_number);
+            }while (guessed_number == -1);
+
+            //printf("numbergroup: %i, row: %i, col: %i, guessed_number: %i\n", group_number, row, col, guessed_number);
+            while (IsNumberInRow(variable, group_number, row, guessed_number) == 1 || IsNumberInCol(variable, group_number, col, guessed_number) == 1)
+            {
+                printf("in while number in...");
+                // guessed_number vergeben, also aus möglichen Nummern streichen (0 einsetzen)
+                for (int j=0; j<9; j++)
+                {
+                    if (inner_copy_of_numbers[j] == guessed_number)
+                    {
+                        inner_copy_of_numbers[j] = 0;
+                        length_inner_copy_of_numbers -= 1;
+                        //printf("%i", length_inner_copy_of_numbers);
+                    }
+                }
+                if (length_inner_copy_of_numbers == 0)
+                {
+                    if (row == 0 && col == 0)
+                    {
+                        reset_group(variable, group_number);
+                        printf("full_reset");
+                        return -1;
+                    }
+                    else
+                    {
+                        reset_group(variable, group_number);
+                        printf("reset");
+                        return 0;
+                    }
+                }
+                do
+                {
+                    guessed_number = get_random_number(inner_copy_of_numbers);
+                }while (guessed_number == -1);
+            }
+            //printf("2");
+            // guessed_number wurde eingesetzt, also aus möglichen Nummern streichen (0 einsetzen)
+            for (int j=0; j<9; j++)
+            {
+                if (copy_of_numbers[j] == guessed_number)
+                {
+                    copy_of_numbers[j] = 0;
+                }
+
+            }
+            variable.nine_niner_fields[group_number][row][col] = guessed_number;
+            printf("group_number: %i; row: %i; col: %i; value: %i\n", group_number, row, col, variable.nine_niner_fields[group_number][row][col]);
+            for (int j=0; j<=row; j++)
+            {
+                for (int i=0; i<=col; i++)
+                {
+                    for (int h=0; h<3; h++)
+                    {
+                        printf("%i", variable.nine_niner_fields[j][i][h]);
+                    }
+                    printf("\n");
+                }
+            }
+        }
+    }
+    return 1;
+}
+
+int get_random_number(int number_array[9])
+{
+    bool number_in_available_numbers = false;
+    int index_guessed_number = rand() % 9 ;
+    int guessed_number = number_array[index_guessed_number];
+    /*
+    printf("number_array[%i]:", index_guessed_number);
+    for (int i=0; i<9; i++)
+    {
+        printf(" %i", number_array[i]);
+    }
+    printf("\n");
+    */
+    //prüfen, ob zufällige Zahl noch in verfügbaren Zahlen (number_array) enthalten ist,
+    //nicht verfügbare Zahlen wurden vorher auf 0 gesetzt
+
+    //printf("number array: %i; guessed: %i\n", number_array[i], guessed_number);
+    if (guessed_number != 0)
+    {
+        number_in_available_numbers = true;
+    }
+
+    if (number_in_available_numbers == false)
+    {
+        return -1;
+    }
+    else
+    {
+        return guessed_number;
+    }
+    return 0;
+}
+
+int reset_group(struct variablen variable, int group_number)
+{
+    for (int row=0; row<3; row++)
+    {
+        for (int col=0; col<3; col++)
+        {
+            variable.nine_niner_fields[group_number][row][col] = 0;
+        }
+    }
+    return 0;
+}
+
+int IsNumberInRow(struct variablen variable, int blockid, int innerrow, int number)
+{
+    //printf("in number is in row");
+    int comparelist[3];
+    int lists;
+    for (int i=0; i<3; i++)
+    {
+        lists = variable.proofrow[blockid][i];
+        comparelist[i] = variable.nine_niner_fields[lists][innerrow][i];
+        printf("%i, %i\n", comparelist[i], number);
+    }
+    //number in comparelist?
+    for (int j=0; j<3; j++)
+    {
+        if (number == comparelist[j])
+        {
+            printf("number in comparelist");
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int IsNumberInCol(struct variablen variable, int blockid, int innercol, int number)
+{
+    int comparelist[3];
+    int lists;
+    for (int i=0; i<3; i++)
+    {
+        lists = variable.proofcol[blockid][i];
+        comparelist[i] = variable.nine_niner_fields[lists][innercol][i];
+    }
+    //number in comparelist?
+    for (int j=0; j<3; j++)
+    {
+        if (number == comparelist[j])
+        {
+            return 1;
+        }
+
+    }
+    return 0;
+}
+
+int ausgabe_felder(struct variablen variable)
+{
+    printf("\n---------------------------\n");
+    for (int j=0; j<9; j++)
+    {
+        for (int i=0; i<3; i++)
+        {
+            for (int h=0; h<3; h++)
+            {
+                printf("%i", variable.nine_niner_fields[j][i][h]);
+            }
+            printf("\n");
+        }
+    }
+    return 0;
+
+}
+
+int main()
+{
+    struct variablen variable;
+    srand(time(NULL));
+
+    variable = init_variablen();
+    //type group - initial group = 1
+    setup_groups(variable, 1);
+    setup_groups(variable, 0);
+    //system("cls");
+    ausgabe_felder(variable);
+    return 0;
+}
