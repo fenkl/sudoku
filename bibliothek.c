@@ -160,6 +160,7 @@ int *move_cursor(int set_cursor_position_x, int set_cursor_position_y)
     int current_cursor_position_x = set_cursor_position_x;
     int current_cursor_position_y = set_cursor_position_y;
     char number_pressed;
+    static int pressed_number_and_cursor_positions[3];
 
     while(1)
     {
@@ -170,20 +171,24 @@ int *move_cursor(int set_cursor_position_x, int set_cursor_position_y)
         switch(key_pressed)
         {
             //Abfangen der Zahlen
-            case 49 ... 57:
+            case 48 ... 57:
                 number_pressed = key_pressed;
                 // Array zur Rückgabe der Werte füllen
-                static int pressed_number_and_cursor_positions[3];
+
                 pressed_number_and_cursor_positions[0] = key_pressed;
                 pressed_number_and_cursor_positions[1] = current_cursor_position_x;
                 pressed_number_and_cursor_positions[2] = current_cursor_position_y;
                 return pressed_number_and_cursor_positions;
                 set_cursor(current_cursor_position_x, current_cursor_position_y);
+            //F3 zum Beenden bzw. Korrigieren
+            case 61:
+                number_pressed = key_pressed;
+                // Array zur Rückgabe der Werte füllen
+                pressed_number_and_cursor_positions[0] = key_pressed;
+                pressed_number_and_cursor_positions[1] = current_cursor_position_x;
+                pressed_number_and_cursor_positions[2] = current_cursor_position_y;
+                return pressed_number_and_cursor_positions;
             //Abfangen der cursor
-            case 13:
-                //
-                return 13;
-
             case 72:
                 if (current_cursor_position_y <= 1)
                 {
@@ -325,7 +330,7 @@ int *Array_ausfuellen_lassen(int bekannte_Zahlen[9][9], int array_zur_Bearbeitun
         int current_cursor_position_x = *(number_pressed_and_cursor_positions + 1);
         int current_cursor_position_y = *(number_pressed_and_cursor_positions + 2);
 
-        if (number_pressed_and_cursor_positions == 13)   // Um Spiel zu beenden
+        if (number_pressed == 61)   // Um Spiel zu beenden
         {
             boolean = 1;
             break;
@@ -337,12 +342,25 @@ int *Array_ausfuellen_lassen(int bekannte_Zahlen[9][9], int array_zur_Bearbeitun
         {
             int x_null = *get_writable_field;
             int y_null = *(get_writable_field + 1);
-            printf("%c", number_pressed);
+            //0 leert Feld wieder
+            int int_number_pressed = number_pressed;
+
+            if (*number_pressed_and_cursor_positions == 48)
+            {
+                printf(".");
+            }
+            else
+            {
+                printf("%c", number_pressed);
+                //printf("%i", int_number_pressed);
+            }
+
             array_zur_Bearbeitung[x_null][y_null] = (int)number_pressed;
         }
         cursor_position_x = current_cursor_position_x;
         cursor_position_y = current_cursor_position_y;
     }
+
    return array_zur_Bearbeitung;
 }
 

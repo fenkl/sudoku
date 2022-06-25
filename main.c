@@ -45,8 +45,9 @@ int main()
     }
 
     level_anzeige(bekannte_Zahlen);
-
-    printf("\n\nZum endgueltigen Beenden und Ueberpruefen ENTER druecken");
+    printf("\n\n");
+    printf("Beenden und Ueberpruefen: F3\n");
+    printf("Zahl zuruecksetzen:       0");
 
     long start = GetTickCount()/1000.0;                                 // start Zeitmessung
 
@@ -62,16 +63,15 @@ int main()
     // Ausgabe der Zeit
     if (needed_time > 60) // Zeitumrechnung in Minuten, wenn notwendig
     {
-        printf("\n\nBenoetigte Zeit: %ld Minuten", needed_time / 60);
+        printf("\n\nBenoetigte Zeit: %ld Minuten\n", needed_time / 60);
     }
     else // ansonsten ausgabe in Sekunden
     {
-        printf("\n\nBenoetigte Zeit: %ld Sekunden", needed_time);
+        printf("\n\nBenoetigte Zeit: %ld Sekunden\n", needed_time);
     }
 
 
     Ueberpruefung_der_Loesung(ausgefuelltes_Sudoku, loesung_Sudoku);
-
 
     return 0;
 }
