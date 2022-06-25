@@ -10,6 +10,7 @@ struct Level {
     int bearbeitung[9][9];
 };
 
+void *show_time(void *needed_time);
 
 int Difficulty();
 

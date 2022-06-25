@@ -3,8 +3,24 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <windows.h>
+#include <pthread.h>
+#include <time.h>
 
 
+void *show_time(void *time_needed)
+{
+    int *needed_time = (int *) time_needed;
+    set_cursor(35, 6);
+    if (*needed_time <= 320) // Umrechnung ab 5 Minuten in Minuten
+    {
+        printf("benoetigte Zeit bisher: %d Sekunden", *needed_time);
+    }
+    else
+    {
+        printf("benoetigte Zeit bisher: %d Minuten  ", *needed_time / 60); //Leerzeichen entfernen letzte Zeichen von "Sekunden" von vorheriger ausgabe
+    }
+    return NULL;
+}
 
 /**
   *
@@ -327,6 +343,8 @@ int IsNumberInArray(int array[9], int number)
   */
 struct Level Array_ausfuellen_lassen(struct Level level)
 {
+    pthread_t thread;
+    long start = GetTickCount()/1000.0;
 
     int cursor_position_x = 2;
     int cursor_position_y = 1;
@@ -363,6 +381,13 @@ struct Level Array_ausfuellen_lassen(struct Level level)
             }
 
             level.array_zur_bearbeitung[x_null][y_null] = (int)number_pressed;
+
+
+            long end = GetTickCount()/1000.0;                 // Ende Zeitmessung
+            long needed_time = end - start;  // Gesamter Zeitverbrauch
+            pthread_create(&thread, NULL, show_time, &needed_time); //thread show_time erstellen
+            pthread_join(thread, NULL); //thread starten
+            Sleep(100);
         }
         cursor_position_x = current_cursor_position_x;
         cursor_position_y = current_cursor_position_y;

@@ -6,9 +6,9 @@
 #include <conio.h>
 #include <windows.h>
 
-
 int main()
 {
+
     struct Level level;
 
     int choosed_level = Difficulty();                        // Level abfragen
@@ -30,11 +30,14 @@ int main()
 
     system("cls");
 
+
+
+
     long end = GetTickCount()/1000.0;                                   // Ende Zeitmessung
     long needed_time = end - start;  // Gesamter Zeitverbrauch
 
     // Ausgabe der Zeit
-    if (needed_time > 60) // Zeitumrechnung in Minuten, wenn notwendig
+    if (needed_time > 300) // Zeitumrechnung in Minuten ab 5 Minuten
     {
         printf("\n\nBenoetigte Zeit: %ld Minuten\n", needed_time / 60);
     }
