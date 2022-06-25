@@ -179,6 +179,7 @@ int level_anzeige(struct Level level)
                 printf("%d ", level.bearbeitung[k][i]);
                 SetConsoleTextAttribute(hConsole, 15); // 15 = weiß mit schwarzem Hintergrund
             }
+            Sleep(0.8);
         }
         //Trenner und Absatz am Zeilenende
         printf("|\n");
@@ -222,8 +223,8 @@ int *move_cursor(int set_cursor_position_x, int set_cursor_position_y)
                 pressed_number_and_cursor_positions[2] = current_cursor_position_y;
                 return pressed_number_and_cursor_positions;
                 set_cursor(current_cursor_position_x, current_cursor_position_y);
-            //F3 zum Beenden bzw. Korrigieren
-            case 61:
+            //Enter zum Beenden bzw. Korrigieren
+            case 13:
                 // Array zur Rückgabe der Werte füllen
                 pressed_number_and_cursor_positions[0] = key_pressed;
                 pressed_number_and_cursor_positions[1] = current_cursor_position_x;
@@ -374,7 +375,7 @@ struct Level Array_ausfuellen_lassen(struct Level level)
         int current_cursor_position_x = *(number_pressed_and_cursor_positions + 1);
         int current_cursor_position_y = *(number_pressed_and_cursor_positions + 2);
 
-        if (number_pressed == 61)   // Um Spiel zu beenden
+        if (number_pressed == 13)   // Um Spiel zu beenden
         {
             boolean = 1;
             break;

@@ -19,7 +19,7 @@ int main()
 
     level_anzeige(level);
     printf("\n\n");
-    printf("Beenden und Ueberpruefen: F3 oder =\n");
+    printf("Beenden und Ueberpruefen: ENTER\n");
     printf("Zahl zuruecksetzen:       0");
 
     long start = GetTickCount()/1000.0;                                 // start Zeitmessung
