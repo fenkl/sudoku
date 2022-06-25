@@ -3,35 +3,63 @@
 #include <conio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <conio.h>
+#include <windows.h>
 
 
 int main()
 {
-    long start = GetTickCount()/1000.0;      // start Zeitmessung
-    int level_difficulty = Difficulty();
-    system("cls");
+    int level_difficulty = Difficulty();                        // Level abfragen
+
+    system("cls");                                              // Console leeren
 
 
-    int *bearbeitung_level;
-    int level_aufbau[9][9];
+    int* bekannte_Zahlen;                                       // Pointer wird erstellt, indem die Speicheradresse des Array gespeichert wird
+    //int* loesung_Sudoku;  //!!! Hier muss irgendwie das L√∂sungs_Sudoku noch rein, passend zu dem auszuf√ºllenden Sudoku
+            static int loesung_Sudoku[9][9]={
+                    {6,4,1,2,9,8,5,3,7},
+                    {3,5,2,1,7,6,9,8,4},
+                    {7,9,8,3,4,5,1,6,2},
+                    {9,2,3,6,1,4,8,7,5},
+                    {1,8,6,5,3,7,4,2,9},
+                    {5,7,4,9,8,2,6,1,3},
+                    {8,3,5,7,6,9,2,4,1},
+                    {4,1,9,8,2,3,7,5,6},
+                    {2,6,7,4,5,1,3,9,8},
+                 };
+
+    bekannte_Zahlen = sudoku_level(1);                          // = array mit den bekannten Zahlen des Sudokus; Level holen, welches bearbeitet werden soll
+
+    // Kopie des Arrays erstellen
+    int array_zur_Bearbeitung[9][9];
     int zaehler_aufbau_fuellen = 0;
-    // Pointer result_level holt sich die Speicheradresse des Arrays in Sudoku_level
-    bearbeitung_level = sodoku_level(1);
+
     for (int i=0; i<9; i++)
     {
         for (int j=0; j<9; j++)
         {
-            // *result_level ist ein eindimensionales Array mit der L‰nge 81
-            // daher wird zweistelliges Array 9x9 damit bef¸llt
-            level_aufbau[i][j] = *(bearbeitung_level + zaehler_aufbau_fuellen);
-            //printf("%d\n", level_aufbau[i][j]);
+            array_zur_Bearbeitung[i][j] = *(bekannte_Zahlen + zaehler_aufbau_fuellen);
+            //printf("%d\n", array_zur_Bearbeitung[i][j]);
             zaehler_aufbau_fuellen += 1;
         }
     }
-    level_anzeige(bearbeitung_level);
-    long end = GetTickCount()/1000.0; // Ende Zeitmessung
-    long needed_time = end - start; // Gesamter Zeitverbrauch
 
+    level_anzeige(bekannte_Zahlen);
+
+    printf("\n\nZum endgueltigen Beenden und Ueberpruefen ENTER druecken");
+
+    long start = GetTickCount()/1000.0;                                 // start Zeitmessung
+
+
+    int* ausgefuelltes_Sudoku;
+    ausgefuelltes_Sudoku = Array_ausfuellen_lassen(bekannte_Zahlen, array_zur_Bearbeitung);    //play
+
+    system("cls");
+
+    long end = GetTickCount()/1000.0;                                   // Ende Zeitmessung
+    long needed_time = end - start;  // Gesamter Zeitverbrauch
+
+    // Ausgabe der Zeit
     if (needed_time > 60) // Zeitumrechnung in Minuten, wenn notwendig
     {
         printf("\n\nBenoetigte Zeit: %ld Minuten", needed_time / 60);
@@ -40,27 +68,10 @@ int main()
     {
         printf("\n\nBenoetigte Zeit: %ld Sekunden", needed_time);
     }
-    int cursor_position_x = 2;
-    int cursor_position_y = 1;
-    while (1)
-    {
-        int *number_pressed_and_cursor_positions;
-        number_pressed_and_cursor_positions = move_cursor(cursor_position_x, cursor_position_y);
-        char number_pressed = *number_pressed_and_cursor_positions;
-        int current_cursor_position_x = *(number_pressed_and_cursor_positions + 1);
-        int current_cursor_position_y = *(number_pressed_and_cursor_positions + 2);
 
-        int *get_writable_field;
-        get_writable_field = check_writable_field(current_cursor_position_x, current_cursor_position_y, bearbeitung_level);
-        if (get_writable_field != 0)
-        {
-            int x_null = *get_writable_field;
-            int y_null = *(get_writable_field + 1);
-            printf("%c", number_pressed);
-        }
-        cursor_position_x = current_cursor_position_x;
-        cursor_position_y = current_cursor_position_y;
-    }
+
+    Ueberpruefung_der_Loesung(ausgefuelltes_Sudoku, loesung_Sudoku);
+
 
     return 0;
 }
