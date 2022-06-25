@@ -4,11 +4,18 @@
 #ifndef BIBLIOTHEK_H_INCLUDED
 #define BIBLIOTHEK_H_INCLUDED
 
+struct Level {
+    int array_zur_bearbeitung[9][9];
+    int loesung[9][9];
+    int bearbeitung[9][9];
+};
+
+
 int Difficulty();
 
-int *sudoku_level(int level);
+struct Level sudoku_level_initialisition(int choosed_level);
 
-int level_anzeige (int level_aufbau[9][9]);
+int level_anzeige (struct Level);
 
 int *move_cursor();
 
@@ -18,8 +25,8 @@ int *check_writable_field (int x, int y, int sudoku[9][9]);
 
 int IsNumberInArray(int array[9], int number);
 
-int *Array_ausfuellen_lassen(int bekannte_Zahlen[9][9], int array_zur_Bearbeitung[9][9]);
+struct Level Array_ausfuellen_lassen(struct Level);
 
-int Ueberpruefung_der_Loesung(int ausgefuelltes_Sudoku[9][9], int loesung_Sudoku[9][9]);
+int Ueberpruefung_der_Loesung(struct Level);
 
 #endif // BIBLIOTHEK_H_INCLUDED

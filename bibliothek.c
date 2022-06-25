@@ -5,6 +5,7 @@
 #include <windows.h>
 
 
+
 /**
   *
   * Abfrage, welcher Schwierigkeitsgrad gespielt werden möchte
@@ -40,6 +41,7 @@ int Difficulty()
             printf("\nBitte geben Sie eine Zahl von 1 - 3 ein");
         }
     }
+    return 0;
 }
 
 /**
@@ -49,12 +51,13 @@ int Difficulty()
  * Quelle: https://www.tutorialspoint.com/cprogramming/c_return_arrays_from_function.htm
  * \return aufbau Sudoku als Array
  **/
-int *sudoku_level(int level)
+struct Level sudoku_level_initialisition(int choosed_level)
 {
-    if (level == 1)
+    struct Level level;
+    if (choosed_level == 1)
     {
     //Vorlage: https://www.raetseldino.de/sudoku-einfach/sudoku-01-einsteiger.pdf
-        static int loesung_leicht[9][9]={
+        int auffueller_loesung_leicht[9][9] = {
                     {6,4,1,2,9,8,5,3,7},
                     {3,5,2,1,7,6,9,8,4},
                     {7,9,8,3,4,5,1,6,2},
@@ -65,7 +68,7 @@ int *sudoku_level(int level)
                     {4,1,9,8,2,3,7,5,6},
                     {2,6,7,4,5,1,3,9,8},
                  };
-        static int bearbeitung_leicht[9][9]={
+        int auffuller_bearbeitung_leicht[9][9] = {
                     {6,4,0,2,9,8,5,0,7},
                     {0,5,2,1,0,6,9,8,4},
                     {7,9,8,0,4,5,0,6,2},
@@ -77,23 +80,32 @@ int *sudoku_level(int level)
                     {2,0,7,4,5,1,3,0,8},
                  };
 
-        return *bearbeitung_leicht;
+        for (int j=0; j<9; j++)
+        {
+            for (int i=0; i<9; i++)
+            {
+                level.loesung[j][i] = auffueller_loesung_leicht[j][i];
+                level.array_zur_bearbeitung[j][i] = auffuller_bearbeitung_leicht[j][i];
+                level.bearbeitung[j][i] = auffuller_bearbeitung_leicht[j][i];
+            }
+        }
     }
-    else if (level == 2)
+    else if (choosed_level == 2)
     {
         //static int loesung
     }
-    else if (level == 3)
+    else if (choosed_level == 3)
     {
 
     }
-    return 0;
+
+    return level;
 }
 
 /**
   * Ausgeben des Sudokus in der Konsole
   **/
-int level_anzeige(int level_aufbau[9][9])
+int level_anzeige(struct Level level)
 {
     int i, j, k;
     for (k=0; k<9; k++)
@@ -120,7 +132,7 @@ int level_anzeige(int level_aufbau[9][9])
                 printf("| ");
             }
             //Nullen als Punkt ausgeben
-            if (level_aufbau[k][i] == 0)
+            if (level.bearbeitung[k][i] == 0)
             {
                 printf(". ");
             }
@@ -131,7 +143,7 @@ int level_anzeige(int level_aufbau[9][9])
                 hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
                 SetConsoleTextAttribute(hConsole, 6); // 3, 5, 6, 9, 11, 12, 13 kommen zur Frage, je nachdem was optisch schöner ist
-                printf("%d ", level_aufbau[k][i]);
+                printf("%d ", level.bearbeitung[k][i]);
                 SetConsoleTextAttribute(hConsole, 15); // 15 = weiß mit schwarzem Hintergrund
             }
         }
@@ -159,7 +171,6 @@ int *move_cursor(int set_cursor_position_x, int set_cursor_position_y)
     set_cursor(set_cursor_position_x, set_cursor_position_y);
     int current_cursor_position_x = set_cursor_position_x;
     int current_cursor_position_y = set_cursor_position_y;
-    char number_pressed;
     static int pressed_number_and_cursor_positions[3];
 
     while(1)
@@ -172,9 +183,7 @@ int *move_cursor(int set_cursor_position_x, int set_cursor_position_y)
         {
             //Abfangen der Zahlen
             case 48 ... 57:
-                number_pressed = key_pressed;
                 // Array zur Rückgabe der Werte füllen
-
                 pressed_number_and_cursor_positions[0] = key_pressed;
                 pressed_number_and_cursor_positions[1] = current_cursor_position_x;
                 pressed_number_and_cursor_positions[2] = current_cursor_position_y;
@@ -182,7 +191,6 @@ int *move_cursor(int set_cursor_position_x, int set_cursor_position_y)
                 set_cursor(current_cursor_position_x, current_cursor_position_y);
             //F3 zum Beenden bzw. Korrigieren
             case 61:
-                number_pressed = key_pressed;
                 // Array zur Rückgabe der Werte füllen
                 pressed_number_and_cursor_positions[0] = key_pressed;
                 pressed_number_and_cursor_positions[1] = current_cursor_position_x;
@@ -317,8 +325,9 @@ int IsNumberInArray(int array[9], int number)
 /**
   * Hier wird das Array von dem Spieler ausgefüllt und am Ende wird das ausgefüllte Array zurückgegeben
   */
-int *Array_ausfuellen_lassen(int bekannte_Zahlen[9][9], int array_zur_Bearbeitung[9][9])
+struct Level Array_ausfuellen_lassen(struct Level level)
 {
+
     int cursor_position_x = 2;
     int cursor_position_y = 1;
     int boolean = 0;
@@ -337,15 +346,13 @@ int *Array_ausfuellen_lassen(int bekannte_Zahlen[9][9], int array_zur_Bearbeitun
         }
 
         int *get_writable_field;
-        get_writable_field = check_writable_field(current_cursor_position_x, current_cursor_position_y, bekannte_Zahlen);
+        get_writable_field = check_writable_field(current_cursor_position_x, current_cursor_position_y, level.bearbeitung);
         if (get_writable_field != 0)
         {
             int x_null = *get_writable_field;
             int y_null = *(get_writable_field + 1);
-            //0 leert Feld wieder
-            int int_number_pressed = number_pressed;
 
-            if (*number_pressed_and_cursor_positions == 48)
+            if (*number_pressed_and_cursor_positions == 48) //0 leert Feld wieder
             {
                 printf(".");
             }
@@ -355,13 +362,13 @@ int *Array_ausfuellen_lassen(int bekannte_Zahlen[9][9], int array_zur_Bearbeitun
                 //printf("%i", int_number_pressed);
             }
 
-            array_zur_Bearbeitung[x_null][y_null] = (int)number_pressed;
+            level.array_zur_bearbeitung[x_null][y_null] = (int)number_pressed;
         }
         cursor_position_x = current_cursor_position_x;
         cursor_position_y = current_cursor_position_y;
     }
 
-   return array_zur_Bearbeitung;
+   return level;
 }
 
 
@@ -369,7 +376,7 @@ int *Array_ausfuellen_lassen(int bekannte_Zahlen[9][9], int array_zur_Bearbeitun
 /**
   * Überprüfung ob das Ergebnis richtig ist mit Ausgabe der Fehler
   */
-int Ueberpruefung_der_Loesung(int ausgefuelltes_Sudoku[9][9], int loesung_Sudoku[9][9])
+int Ueberpruefung_der_Loesung(struct Level level)
 {
     HANDLE hConsole;
     int i, j, k;
@@ -398,12 +405,12 @@ int Ueberpruefung_der_Loesung(int ausgefuelltes_Sudoku[9][9], int loesung_Sudoku
             }
 
             //Falsche Werte rot und richtige Werte grün ausgeben
-            if (ausgefuelltes_Sudoku[k][i] == loesung_Sudoku[k][i])
+            if (level.array_zur_bearbeitung[k][i] == level.loesung[k][i])
             {
                 hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
                 SetConsoleTextAttribute(hConsole, 10); // richtig = grün
 
-                printf("%i ", ausgefuelltes_Sudoku[k][i]);
+                printf("%i ", level.array_zur_bearbeitung[k][i]);
 
                 SetConsoleTextAttribute(hConsole, 15); // 15 = weiß mit schwarzem Hintergrund
             }
@@ -412,7 +419,7 @@ int Ueberpruefung_der_Loesung(int ausgefuelltes_Sudoku[9][9], int loesung_Sudoku
                 hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
                 SetConsoleTextAttribute(hConsole, 4); // falsch = rot
 
-                printf("%d ", ausgefuelltes_Sudoku[k][i]);
+                printf("%d ", level.array_zur_bearbeitung[k][i]);
 
                 SetConsoleTextAttribute(hConsole, 15); // 15 = weiß mit schwarzem Hintergrund
             }

@@ -9,42 +9,15 @@
 
 int main()
 {
-    int level_difficulty = Difficulty();                        // Level abfragen
+    struct Level level;
+
+    int choosed_level = Difficulty();                        // Level abfragen
 
     system("cls");                                              // Console leeren
 
+    level = sudoku_level_initialisition(choosed_level);                         // = array mit den bekannten Zahlen des Sudokus; Level holen, welches bearbeitet werden soll
 
-    int* bekannte_Zahlen;                                       // Pointer wird erstellt, indem die Speicheradresse des Array gespeichert wird
-    //int* loesung_Sudoku;  //!!! Hier muss irgendwie das Lösungs_Sudoku noch rein, passend zu dem auszufüllenden Sudoku
-            static int loesung_Sudoku[9][9]={
-                    {6,4,1,2,9,8,5,3,7},
-                    {3,5,2,1,7,6,9,8,4},
-                    {7,9,8,3,4,5,1,6,2},
-                    {9,2,3,6,1,4,8,7,5},
-                    {1,8,6,5,3,7,4,2,9},
-                    {5,7,4,9,8,2,6,1,3},
-                    {8,3,5,7,6,9,2,4,1},
-                    {4,1,9,8,2,3,7,5,6},
-                    {2,6,7,4,5,1,3,9,8},
-                 };
-
-    bekannte_Zahlen = sudoku_level(1);                          // = array mit den bekannten Zahlen des Sudokus; Level holen, welches bearbeitet werden soll
-
-    // Kopie des Arrays erstellen
-    int array_zur_Bearbeitung[9][9];
-    int zaehler_aufbau_fuellen = 0;
-
-    for (int i=0; i<9; i++)
-    {
-        for (int j=0; j<9; j++)
-        {
-            array_zur_Bearbeitung[i][j] = *(bekannte_Zahlen + zaehler_aufbau_fuellen);
-            //printf("%d\n", array_zur_Bearbeitung[i][j]);
-            zaehler_aufbau_fuellen += 1;
-        }
-    }
-
-    level_anzeige(bekannte_Zahlen);
+    level_anzeige(level);
     printf("\n\n");
     printf("Beenden und Ueberpruefen: F3\n");
     printf("Zahl zuruecksetzen:       0");
@@ -52,8 +25,8 @@ int main()
     long start = GetTickCount()/1000.0;                                 // start Zeitmessung
 
 
-    int* ausgefuelltes_Sudoku;
-    ausgefuelltes_Sudoku = Array_ausfuellen_lassen(bekannte_Zahlen, array_zur_Bearbeitung);    //play
+    int ausgefuelltes_Sudoku;
+    level = Array_ausfuellen_lassen(level);    //play
 
     system("cls");
 
@@ -71,7 +44,7 @@ int main()
     }
 
 
-    Ueberpruefung_der_Loesung(ausgefuelltes_Sudoku, loesung_Sudoku);
+    Ueberpruefung_der_Loesung(level);
 
     return 0;
 }
