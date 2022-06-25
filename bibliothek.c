@@ -7,17 +7,34 @@
 #include <time.h>
 
 
+/**
+* Thread für Zeitanzeige, wird aufgerufen von Array_ausfuellen_lassen
+*/
 void *show_time(void *time_needed)
 {
     int *needed_time = (int *) time_needed;
+    int needed_minutes, needed_seconds;
     set_cursor(35, 6);
-    if (*needed_time <= 320) // Umrechnung ab 5 Minuten in Minuten
+
+    needed_seconds = *needed_time;
+
+    if (needed_seconds <= 60) // Umrechnung ab 1 Minute in Minuten
     {
-        printf("benoetigte Zeit bisher: %d Sekunden", *needed_time);
+       printf("benoetigte Zeit bisher: %i Sekunden", needed_seconds);
     }
     else
     {
-        printf("benoetigte Zeit bisher: %d Minuten  ", *needed_time / 60); //Leerzeichen entfernen letzte Zeichen von "Sekunden" von vorheriger ausgabe
+        needed_minutes = *needed_time / 60;
+        needed_seconds = *needed_time - (needed_minutes * 60);
+        if (needed_minutes == 1)
+        {
+            printf("benoetigte Zeit bisher: %i Minute und %i Sekunden", needed_minutes, needed_seconds);
+
+        }
+        else
+        {
+            printf("benoetigte Zeit bisher: %i Minuten und %i Sekunden", needed_minutes, needed_seconds);
+        }
     }
     return NULL;
 }
@@ -380,8 +397,8 @@ struct Level Array_ausfuellen_lassen(struct Level level)
                 //printf("%i", int_number_pressed);
             }
 
-            level.array_zur_bearbeitung[x_null][y_null] = (int)number_pressed;
-
+            int int_number_pressed = number_pressed - 48; //Ascii zu Int
+            level.array_zur_bearbeitung[x_null][y_null] = int_number_pressed;
 
             long end = GetTickCount()/1000.0;                 // Ende Zeitmessung
             long needed_time = end - start;  // Gesamter Zeitverbrauch

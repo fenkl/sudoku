@@ -19,7 +19,7 @@ int main()
 
     level_anzeige(level);
     printf("\n\n");
-    printf("Beenden und Ueberpruefen: F3\n");
+    printf("Beenden und Ueberpruefen: F3 oder =\n");
     printf("Zahl zuruecksetzen:       0");
 
     long start = GetTickCount()/1000.0;                                 // start Zeitmessung
@@ -30,20 +30,27 @@ int main()
 
     system("cls");
 
-
-
-
     long end = GetTickCount()/1000.0;                                   // Ende Zeitmessung
     long needed_time = end - start;  // Gesamter Zeitverbrauch
-
+    long needed_minutes, needed_seconds;
+    needed_seconds = needed_time;
     // Ausgabe der Zeit
-    if (needed_time > 300) // Zeitumrechnung in Minuten ab 5 Minuten
+    if (needed_seconds >= 60) // Zeitumrechnung in Minuten ab 5 Minuten
     {
-        printf("\n\nBenoetigte Zeit: %ld Minuten\n", needed_time / 60);
+        needed_minutes = needed_time / 60;
+        needed_seconds = needed_time - (needed_minutes * 60);
+        if (needed_minutes == 1)
+        {
+            printf("\n\nBenoetigte Zeit insgesamt: %ld Minute und %ld Sekunden\n", needed_minutes, needed_seconds);
+        }
+        else
+        {
+            printf("\n\nBenoetigte Zeit insgesamt: %ld Minuten und %ld Sekunden\n", needed_minutes, needed_seconds);
+        }
     }
     else // ansonsten ausgabe in Sekunden
     {
-        printf("\n\nBenoetigte Zeit: %ld Sekunden\n", needed_time);
+        printf("\n\nBenoetigte Zeit insgesamt: %ld Sekunden\n", needed_seconds);
     }
 
 
