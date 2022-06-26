@@ -1,3 +1,10 @@
+/**
+* Programm zum Erstellen eines Sudokulevels
+* Autoren: Klara von Lehmden, Francisco Fenkl und Henry Hamker
+* Vollendet am: 26.06.2022
+**/
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,17 +14,19 @@
 
 
 
-
+/**
+* Initialisierung aller notwendigen Variablen
+**/
 struct variablen init_variablen()
 {
-
     struct variablen variable;
-    variable.initial_groups[0] = 0; variable.initial_groups[1] = 4; variable.initial_groups[2] = 8;
+    variable.initial_groups[0] = 0; variable.initial_groups[1] = 4; variable.initial_groups[2] = 8; //Neuner-Gruppen (Kästchen), die unabhängig voneinander gefüllt werden können
     variable.try_counter = 0;
     variable.reset_count = 0;
     variable.max_group_reset = 9;
     variable.group_reset_result = 0;
 
+    // Arrays mit Nullen füllen
     for (int i=0; i<9; i++)
     {
         for (int j=0; j<9; j++)
@@ -41,10 +50,10 @@ struct variablen init_variablen()
     for (int i=0; i<9; i++)
     {
         int x = i + 1;
-        variable.numbers[i] = x;
-        //printf("numbers: %i\n", variable.numbers[i]);
+        variable.numbers[i] = x; //verfügbare Zahlen
     }
 
+    //proofrow entspricht: [[0, 1, 2], [0, 1, 2], [0, 1, 2], [3, 4, 5], [3, 4, 5], [3, 4, 5], [6, 7, 8], [6, 7, 8], [6, 7, 8]]
     for (int j=0; j<9; j++)
     {
         if (j>=0 && j<=2)
@@ -52,7 +61,6 @@ struct variablen init_variablen()
             for (int h=0; h<3; h++)
             {
                 variable.proofrow[j][h] = h;
-                //printf("\n%i", proofrow[j][h]);
             }
         }
         else if (j>=3 && j<=5)
@@ -60,7 +68,6 @@ struct variablen init_variablen()
             for (int h=0; h<3; h++)
             {
                 variable.proofrow[j][h] = h + 3;
-                //printf("\n%i", proofrow[j][h]);
             }
         }
         else if (j>=6 && j<=8)
@@ -68,11 +75,11 @@ struct variablen init_variablen()
             for (int h=0; h<3; h++)
             {
                 variable.proofrow[j][h] = h + 6;
-                //printf("\n%i", proofrow[j][h]);
             }
         }
     }
 
+    //proofcol entspricht: [[0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8]]
     for (int j=0; j<9; j++)
     {
         if (j==0 || j==3 || j==6)
@@ -96,6 +103,7 @@ struct variablen init_variablen()
         }
     }
 
+    //restliche voneinander abhängige Gruppen: [1, 2, 3, 5, 6, 7]
     for (int j=0; j<6; j++)
     {
         if (j>=0 && j<=2)
@@ -106,30 +114,28 @@ struct variablen init_variablen()
         {
             variable.rest_of_groups[j] = j + 2;
         }
-        //printf("%i", rest_of_groups[j]);
     }
 
     return variable;
 }
 
 
+/**
+* Bekommmt die zu verarbeitende Gruppe mitgegeben
+* Überwacht Brute-Force-Prozess (define_group)
+*/
 struct variablen setup_groups(struct variablen variable, int type_of_group)
 {
-    //printf("%i", variable.initial_groups[0]);
-
     int groups[6];
 
     int length_groups;
-    //printf("%i\n", type_of_group);
     if (type_of_group == 1)
     {
         length_groups = 3;
         for (int i=0; i<3; i++)
         {
             groups[i] = variable.initial_groups[i];
-            //printf("%i", groups[i]);
         }
-        //printf("%i", groups[0]);
     }
     else
     {
@@ -137,7 +143,6 @@ struct variablen setup_groups(struct variablen variable, int type_of_group)
         for (int i=0; i<6; i++)
         {
             groups[i] = variable.rest_of_groups[i];
-            //printf("rest:%i", groups[i]);
         }
     }
 
@@ -148,12 +153,12 @@ struct variablen setup_groups(struct variablen variable, int type_of_group)
         variable = define_group(variable, group);
 
 
-        //done = 1
+        //group done = 1
         if (variable.group_reset_result == 1)
         {
             list_pointer += 1;
         }
-        //reset = 0
+        //reset group = 0
         else if (variable.group_reset_result == 0)
         {
             variable.reset_count += 1;
@@ -165,12 +170,11 @@ struct variablen setup_groups(struct variablen variable, int type_of_group)
             }
             else
             {
-
+                //pass
             }
         }
         else
         {
-
             list_pointer = 0;
             variable.reset_count = 0;
         }
@@ -179,21 +183,21 @@ struct variablen setup_groups(struct variablen variable, int type_of_group)
     return variable;
 }
 
-
+/**
+*
+*/
 struct variablen define_group(struct variablen variable, int group_number)
 {
-
     variable.try_counter += 1;
 
     int copy_of_numbers[9];
     int length_copy_of_numbers = 9;
 
 
-    //copy of numbers f�llen
+    //copy of numbers füllen
     for (int j=0; j<9; j++)
     {
         copy_of_numbers[j] = variable.numbers[j];
-        //printf("copy: %i\n", copy_of_numbers[j]);
     }
 
     for (int row=0; row<3; row++)
@@ -207,34 +211,25 @@ struct variablen define_group(struct variablen variable, int group_number)
                 inner_copy_of_numbers[i] = copy_of_numbers[i];
             }
             int guessed_number;
-            //wenn copy_of_numbers nicht guessed_number enth�lt, erneut zuf�llige Zahl suchen
+            //wenn copy_of_numbers nicht guessed_number enthält, erneut zufällige Zahl suchen
             do
             {
                 guessed_number = get_random_number(copy_of_numbers);
-                //printf("guessed 1: %i\n", guessed_number);
             }while (guessed_number == -1);
 
-
-            //printf("numbergroup: %i, row: %i, col: %i, guessed_number: %i\n", group_number, row, col, guessed_number);
+            //Prüfen, ob sich guessed_number in selber Reihe oder Spalte befindet
             while (IsNumberInRow(variable, group_number, row, guessed_number) == 1 || IsNumberInCol(variable, group_number, col, guessed_number) == 1)
             {
-
-                // guessed_number vergeben, also aus m�glichen Nummern streichen (0 einsetzen)
-                //printf("available: ");
+                // guessed_number vergeben, also aus möglichen Nummern streichen (0 einsetzen)
                 for (int j=0; j<9; j++)
                 {
-
                     if (inner_copy_of_numbers[j] == guessed_number)
                     {
                         inner_copy_of_numbers[j] = 0;
                         length_inner_copy_of_numbers = length_inner_copy_of_numbers - 1;
-                        //printf("length_numbers: %i\n", length_inner_copy_of_numbers);
                     }
-
-
                 }
-                //printf("\n");
-                if (length_inner_copy_of_numbers == 0)
+                if (length_inner_copy_of_numbers == 0) //Keine möglichen Zahlen mehr vorhanden, also Reset
                 {
                     if (row == 0 && col == 0)
                     {
@@ -256,7 +251,7 @@ struct variablen define_group(struct variablen variable, int group_number)
                     guessed_number = get_random_number(inner_copy_of_numbers);
                 }while (guessed_number == -1);
             }
-            // guessed_number wurde eingesetzt, also aus m�glichen Nummern streichen (0 einsetzen)
+            // wenn guessed_number in copy_of_numbers enthalten, aus möglichen Nummern streichen (0 einsetzen)
             for (int j=0; j<9; j++)
             {
                 if (copy_of_numbers[j] == guessed_number)
@@ -266,7 +261,7 @@ struct variablen define_group(struct variablen variable, int group_number)
                 }
             }
 
-            variable.nine_niner_fields[group_number][row][col] = guessed_number;
+            variable.nine_niner_fields[group_number][row][col] = guessed_number; //Einsetzen der passenden Nummer in Array
 
         }
     }
@@ -274,6 +269,10 @@ struct variablen define_group(struct variablen variable, int group_number)
     return variable;
 }
 
+
+/**
+* Erzeugt zufällige Zahl
+*/
 int get_random_number(int number_array[9])
 {
     bool number_in_available_numbers = false;
@@ -296,6 +295,10 @@ int get_random_number(int number_array[9])
     return 0;
 }
 
+
+/**
+* Setzt beim Stocken des Brute-Force-Prozesses die Gruppen zurück
+*/
 struct variablen reset_group(struct variablen variable, int group_number)
 {
     for (int row=0; row<3; row++)
@@ -308,6 +311,10 @@ struct variablen reset_group(struct variablen variable, int group_number)
     return variable;
 }
 
+
+/**
+* Prüft, ob gewählte Nummer in Zeile vorhanden ist
+*/
 int IsNumberInRow(struct variablen variable, int blockid, int innerrow, int number)
 {
     int comparelist[9] = {0};
@@ -317,7 +324,7 @@ int IsNumberInRow(struct variablen variable, int blockid, int innerrow, int numb
         lists[i] = variable.proofrow[blockid][i];
     }
 
-    //comparelist f�llen
+    //comparelist füllen
     comparelist[0] = variable.nine_niner_fields[lists[0]][innerrow][0];
     comparelist[1] = variable.nine_niner_fields[lists[0]][innerrow][1];
     comparelist[2] = variable.nine_niner_fields[lists[0]][innerrow][2];
@@ -341,6 +348,10 @@ int IsNumberInRow(struct variablen variable, int blockid, int innerrow, int numb
     return 0;
 }
 
+
+/**
+* Prüft, ob gewählte Nummer in spalte vorhanden ist
+*/
 int IsNumberInCol(struct variablen variable, int blockid, int innercol, int number)
 {
     int comparelist[9] = {0};
@@ -349,10 +360,9 @@ int IsNumberInCol(struct variablen variable, int blockid, int innercol, int numb
     for (int i=0; i<3; i++)
     {
         lists[i] = variable.proofcol[blockid][i];
-        //printf("lists: %i, innecol: %i, i: %i\n", lists[i], innercol, i);
     }
 
-    //comparelist f�llen
+    //comparelist füllen
     comparelist[0] = variable.nine_niner_fields[lists[0]][0][innercol];
     comparelist[1] = variable.nine_niner_fields[lists[0]][1][innercol];
     comparelist[2] = variable.nine_niner_fields[lists[0]][2][innercol];
@@ -379,35 +389,35 @@ int IsNumberInCol(struct variablen variable, int blockid, int innercol, int numb
 }
 
 
-
+/**
+* Erstellt 2D-Array aus 3D-Array (notwendig für korrekte Ausgabe)
+* variable.two_d_array_of_niner_fields entspricht am Ende der Lösung für das erstellte Level
+*/
 struct variablen niner_fields_to_2d_array(struct variablen variable)
 {
-
-
     int *pointer_to_niner_fields;
     int helper_two_d_array[9][9];
+    //Speicheradresse des 3D-Arrays beziehen
     pointer_to_niner_fields = *variable.nine_niner_fields;
-    int zaehler_aufbau_fuellen = 0;
+    int counter = 0;
 
+    //3d-array zu 2d-array
     for (int i=0; i<9; i++)
     {
         for (int j=0; j<9; j++)
         {
-            // *result_level ist ein eindimensionales Array mit der L�nge 81
-            // daher wird zweistelliges Array 9x9 damit bef�llt
-            helper_two_d_array[i][j] = *(pointer_to_niner_fields + zaehler_aufbau_fuellen);
-            zaehler_aufbau_fuellen += 1;
+            helper_two_d_array[i][j] = *(pointer_to_niner_fields + counter);
+            counter += 1;
         }
     }
 
-
-
-    //Spalten und Zeilen konvertieren
+    //Spalten und Zeilen umschreiben für Ausgabe
     for (int j=0; j<3; j++)
     {
         variable.two_d_array_of_niner_fields[0][j] = helper_two_d_array[0][j];
     }
-    // Sorry f�r den M�ll
+
+    // Sorry
     variable.two_d_array_of_niner_fields[0][3] = helper_two_d_array[1][0];
     variable.two_d_array_of_niner_fields[0][4] = helper_two_d_array[1][1];
     variable.two_d_array_of_niner_fields[0][5] = helper_two_d_array[1][2];
@@ -496,11 +506,12 @@ struct variablen niner_fields_to_2d_array(struct variablen variable)
     variable.two_d_array_of_niner_fields[8][8] = helper_two_d_array[8][8];
 
 
-
     return variable;
 }
 
-
+/**
+* Ersetzt zufällige Zahlen durch Nullen, um Level zu erstellen
+*/
 struct variablen create_level(struct variablen variable)
 {
     int numbers[9] = {1,2,3,4,5,6,7,8,9};
@@ -517,7 +528,7 @@ struct variablen create_level(struct variablen variable)
         }
     }
 
-
+    //Zufällige Zahl als Index holen
     for (int i=0; i<9; i++)
     {
         for (int j=0; j<9; j++)
@@ -525,6 +536,8 @@ struct variablen create_level(struct variablen variable)
             array_index_to_del[i][j] = get_random_number(numbers);
         }
     }
+
+    //Nullen einfügen
     for (int i=0; i<6; i++)
     {
         for (int j=0; j<9; j++)
@@ -535,11 +548,6 @@ struct variablen create_level(struct variablen variable)
         }
     }
 
-
-
     return variable;
-
-
-
 }
 
