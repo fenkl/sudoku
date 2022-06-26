@@ -1,6 +1,6 @@
 /**
 * Programm zum Spielen eines Sudokus innerhalb der Konsole
-* Autoren: Klara von Lehmden, Julius Francisco Fenkl und Henry Hamker
+* Autoren: Klara von Lehmden, Francisco Fenkl und Henry Hamker
 * Vollendet am: 26.06.2022
 **/
 
