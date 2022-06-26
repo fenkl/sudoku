@@ -39,6 +39,8 @@ double prozent_richtig (int gesamt, int falsch);
 
 struct Level weiterspielen(struct Level);
 
+long zeit_berechnen(long start, long end);
+
 //struct Level datei_einlesen(struct Level);
 
 #endif // BIBLIOTHEK_H_INCLUDED
