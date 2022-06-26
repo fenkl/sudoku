@@ -510,6 +510,7 @@ struct Level Array_ausfuellen_lassen(struct Level level)
 
 /**
   * Überprüfung ob das Ergebnis richtig ist mit Ausgabe der Fehler
+  bei falscher lösung wird 0 zurückgegeben
   */
 int Ueberpruefung_der_Loesung(struct Level level, int gesamt)
 {
@@ -562,7 +563,7 @@ int Ueberpruefung_der_Loesung(struct Level level, int gesamt)
 
                 SetConsoleTextAttribute(hConsole, 15); // 15 = weiß mit schwarzem Hintergrund
 
-                finished = 0;
+                finished = 0;//Lösung ist damit nicht komplett richtig
                 prozent +=1;
             }
         }
@@ -575,17 +576,19 @@ int Ueberpruefung_der_Loesung(struct Level level, int gesamt)
     {
         printf("-------+");
     }
-    double temp = prozent_richtig(gesamt, prozent);
+    double temp = prozent_richtig(gesamt, prozent);//Prozent der richtig eingegebenen Zahlen von noch offenen Stellen
 
-    if(temp!=100)
+    if(temp!=100)//Falls fertig gelöst ist wird der Fall anders aufgefangen
     {
-        printf("\n richtige Eingaben = %.2f %% \n", temp );
+        printf("\n richtige Eingaben = %.2f %% \n", temp );//Ausgabe der Prozentahl
     }
 
     return finished;
 }
 
-
+/**
+  * Ermittelt die Anzahl an Nullen aus dem übergebenen Strukt und gibt diese zurück
+  */
 int anzahl_nullen(struct Level level)
 {
    int i,j,counter =0;
@@ -593,7 +596,7 @@ int anzahl_nullen(struct Level level)
    {
         for(j=0; j<9; j++)
         {
-            if (level.bearbeitung[j][i]==0)
+            if (level.bearbeitung[j][i]==0)//Nullen werden aus der Vorlage ermittelt
             {
                 counter +=1;
             }
@@ -602,6 +605,10 @@ int anzahl_nullen(struct Level level)
    return counter;
 }
 
+/**
+  * Prozentzahl wird ermittelt, die bei der Überprüfung von den eingegebenen Zahlen
+  * im Gegensatz zu den offenen Stellen richtig ist
+  */
 double prozent_richtig (int gesamt, int falsch)
     {
         double wrong=falsch;
@@ -610,7 +617,10 @@ double prozent_richtig (int gesamt, int falsch)
         double prozent = 100-(wrong/total*100);
         return prozent;
     }
-
+/**
+  * Level wird nach dem Überprüfen, ggf. fortgesetzt, 
+  * dafür werden die bereits richtigeingegeben Zahlen in das zu bearbeitene Level integriert
+  */
 struct Level weiterspielen(struct Level level)
 {
     int k,i;
@@ -618,7 +628,7 @@ struct Level weiterspielen(struct Level level)
     {
         for ( i=0; i<9; i++)
         {
-            //Falsche Werte rot und richtige Werte grün ausgeben
+            //nur die richtig eingegeben Zahlen werden zum "Neustart" übernommen
             if (level.array_zur_bearbeitung[k][i] == level.loesung[k][i])
             {
             level.bearbeitung[k][i]=level.array_zur_bearbeitung[k][i];
@@ -628,6 +638,10 @@ struct Level weiterspielen(struct Level level)
     }
     return level;
 }
+
+/**
+  * Umrechnen von Zeit in sec. in Minuten und weitere
+  */
 long zeit_berechnen(long start, long end)
 {
     long needed_time = end - start;  // Gesamter Zeitverbrauch
