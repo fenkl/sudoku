@@ -54,15 +54,16 @@ int Difficulty()
     printf("\n (1) Einfach");
     printf("\n (2) Normal");
     printf("\n (3) Schwer");
+    printf("\n\n (4) Datei einlesen");
 
     while (input_accepted== 0)
     {
-        printf("\n\nSchwierigkeit: ");
+        printf("\n\n zufaelliges Level: ");
 
         scanf("%d", &difficulty_input);
         fflush(stdin);
 
-        if (difficulty_input > 0 && difficulty_input< 4)
+        if (difficulty_input > 0 && difficulty_input< 5)
         {
             input_accepted = 1;
             return difficulty_input;
@@ -125,13 +126,80 @@ struct Level sudoku_level_initialisition(int choosed_level)
     }
     else if (choosed_level == 2)
     {
-        //static int loesung
+        //Vorlage: https://www.raetseldino.de/sudoku-mittel/sudoku-mittel-schwer-loesung-m14.pdf
+        int auffueller_loesung_mittel[9][9] = {
+                    {5,3,4,1,9,6,8,7,2},
+                    {2,8,9,5,7,4,6,3,1},
+                    {1,7,6,2,8,3,4,9,5},
+                    {6,9,7,4,5,1,3,2,8},
+                    {3,5,8,7,6,2,1,4,9},
+                    {4,1,2,9,3,8,7,5,6},
+                    {9,2,1,6,4,7,5,8,3},
+                    {8,4,5,3,1,9,2,6,7},
+                    {7,6,3,8,2,5,9,1,4},
+                 };
+        int auffuller_bearbeitung_mittel[9][9] = {
+                    {0,0,0,1,0,0,0,0,0},
+                    {2,0,0,0,7,0,0,3,0},
+                    {0,0,6,0,8,3,0,9,0},
+                    {0,0,7,4,0,1,3,0,0},
+                    {3,5,8,0,6,0,1,0,0},
+                    {0,1,0,9,0,0,0,0,0},
+                    {9,0,0,6,0,0,5,0,0},
+                    {0,4,0,0,0,0,0,0,7},
+                    {0,0,3,0,0,5,0,0,0},
+                 };
+
+        for (int j=0; j<9; j++)
+        {
+            for (int i=0; i<9; i++)
+            {
+                level.loesung[j][i] = auffueller_loesung_mittel[j][i];
+                level.array_zur_bearbeitung[j][i] = auffuller_bearbeitung_mittel[j][i];
+                level.bearbeitung[j][i] = auffuller_bearbeitung_mittel[j][i];
+            }
+        }
     }
     else if (choosed_level == 3)
     {
+        //Vorlage: https://www.raetseldino.de/sudoku-schwer/sudoku-17-extra-schwer.pdf
+        int auffueller_loesung_schwer[9][9] = {
+                    {9,1,7,5,2,4,6,8,3},
+                    {8,3,6,1,9,7,4,2,5},
+                    {5,4,2,8,3,6,1,7,9},
+                    {3,5,1,6,4,8,7,9,2},
+                    {4,2,9,3,7,1,8,5,6},
+                    {6,7,8,9,5,2,3,4,1},
+                    {7,8,5,2,1,3,9,6,4},
+                    {1,9,4,7,6,5,2,3,8},
+                    {2,6,3,4,8,9,5,1,7},
+                 };
+        int auffuller_bearbeitung_schwer[9][9] = {
+                    {9,0,0,0,2,4,0,8,0},
+                    {8,3,0,0,0,0,0,2,0},
+                    {0,0,0,0,3,0,0,7,0},
+                    {0,5,1,6,4,8,0,0,0},
+                    {0,2,0,0,0,1,0,0,0},
+                    {6,0,8,0,0,0,0,0,0},
+                    {0,8,5,0,1,0,9,0,0},
+                    {0,0,4,7,0,5,0,0,0},
+                    {2,0,0,0,0,0,0,1,0},
+                 };
+
+        for (int j=0; j<9; j++)
+        {
+            for (int i=0; i<9; i++)
+            {
+                level.loesung[j][i] = auffueller_loesung_schwer[j][i];
+                level.array_zur_bearbeitung[j][i] = auffuller_bearbeitung_schwer[j][i];
+                level.bearbeitung[j][i] = auffuller_bearbeitung_schwer[j][i];
+            }
+        }
+    }
+    else if (choosed_level == 4)
+    {
 
     }
-
     return level;
 }
 
@@ -419,10 +487,12 @@ struct Level Array_ausfuellen_lassen(struct Level level)
 /**
   * Überprüfung ob das Ergebnis richtig ist mit Ausgabe der Fehler
   */
-int Ueberpruefung_der_Loesung(struct Level level)
+int Ueberpruefung_der_Loesung(struct Level level, int gesamt)
 {
     HANDLE hConsole;
     int i, j, k;
+    int finished = 1;
+    int prozent =0;
     for (k=0; k<9; k++)
     {
         //Trenner am Anfang und jeweils nach drei Zahlen einfügen (spaltenweise)
@@ -456,6 +526,8 @@ int Ueberpruefung_der_Loesung(struct Level level)
                 printf("%i ", level.array_zur_bearbeitung[k][i]);
 
                 SetConsoleTextAttribute(hConsole, 15); // 15 = weiß mit schwarzem Hintergrund
+
+
             }
             else
             {
@@ -465,6 +537,9 @@ int Ueberpruefung_der_Loesung(struct Level level)
                 printf("%d ", level.array_zur_bearbeitung[k][i]);
 
                 SetConsoleTextAttribute(hConsole, 15); // 15 = weiß mit schwarzem Hintergrund
+
+                finished = 0;
+                prozent +=1;
             }
         }
         //Trenner und Absatz am Zeilenende
@@ -476,5 +551,132 @@ int Ueberpruefung_der_Loesung(struct Level level)
     {
         printf("-------+");
     }
+    double temp = prozent_richtig(gesamt, prozent);
+
+    if(temp!=100)
+    {
+        printf("\n richtige Eingaben = %.2f %% \n", temp );
+    }
+
+    return finished;
+}
+
+
+int anzahl_nullen(struct Level level)
+{
+   int i,j,counter =0;
+   for(i=0; i<9;  i++)
+   {
+        for(j=0; j<9; j++)
+        {
+            if (level.bearbeitung[j][i]==0)
+            {
+                counter +=1;
+            }
+        }
+   }
+   return counter;
+}
+
+double prozent_richtig (int gesamt, int falsch)
+    {
+        double wrong=falsch;
+        double total=gesamt;
+
+        double prozent = 100-(wrong/total*100);
+        return prozent;
+    }
+
+struct Level weiterspielen(struct Level level)
+{
+    int k,i;
+    for (k=0; k<9; k++)
+    {
+        for ( i=0; i<9; i++)
+        {
+            //Falsche Werte rot und richtige Werte grün ausgeben
+            if (level.array_zur_bearbeitung[k][i] == level.loesung[k][i])
+            {
+            level.bearbeitung[k][i]=level.array_zur_bearbeitung[k][i];
+            }
+           level.array_zur_bearbeitung[k][i] = level.bearbeitung[k][i];
+        }
+    }
+    return level;
+}
+long zeit_berechnen(long start, long end)
+{
+    long needed_time = end - start;  // Gesamter Zeitverbrauch
+    long needed_minutes, needed_seconds;
+    needed_seconds = needed_time;
+    // Ausgabe der Zeit
+    if (needed_seconds >= 60) // Zeitumrechnung in Minuten ab 5 Minuten
+    {
+        needed_minutes = needed_time / 60;
+        needed_seconds = needed_time - (needed_minutes * 60);
+        if (needed_minutes == 1)
+        {
+            printf("\n\nBenoetigte Zeit insgesamt: %ld Minute und %ld Sekunden\n", needed_minutes, needed_seconds);
+        }
+        else
+        {
+            printf("\n\nBenoetigte Zeit insgesamt: %ld Minuten und %ld Sekunden\n", needed_minutes, needed_seconds);
+        }
+    }
+    else // ansonsten ausgabe in Sekunden
+    {
+        printf("\n\nBenoetigte Zeit insgesamt: %ld Sekunden\n", needed_seconds);
+    }
     return 0;
 }
+
+
+/*
+struct Level datei_einlesen(struct Level level)
+{
+        char filename[120];
+        printf("/n Dateipfad angeben:");
+        fgets(filename, 120, stdin);
+    const char* filename2 = filename;
+    FILE *fp;
+    int temp;
+    printf ("%s", filename2);
+        fp = fopen(filename2, "r");
+
+    if(fp == NULL) {
+        printf("Datei konnte nicht geoeffnet werden.\n");
+    }else {
+	// komplette Datei zeichenweise ausgeben
+	while((temp = fgetc(fp))!=EOF) {
+    printf("%c ", temp);
+
+	}
+	fclose(fp);
+}
+
+
+    FILE* input_file = fopen(filename, "r");
+    if (!input_file)
+        exit(EXIT_FAILURE);
+
+    struct stat sb;
+    if (stat(filename, &sb) == -1) {
+        perror("stat");
+        exit(EXIT_FAILURE);
+    }
+
+    char* file_contents = malloc(sb.st_size);
+    fread(file_contents, sb.st_size, 1, input_file);
+
+    printf("%s\n", file_contents);
+
+    fclose(input_file);
+    free(file_contents);
+
+    printf("/n %s",file_contents);
+    exit(EXIT_SUCCESS);
+
+    printf("/n %s",file_contents);
+
+    return level;
+*/
