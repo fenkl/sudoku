@@ -1,3 +1,9 @@
+/**
+* Programm zum Spielen eines Sudokus innerhalb der Konsole
+* Autoren: Klara von Lehmden, Julius Francisco Fenkl und Henry Hamker
+* Vollendet am: 26.06.2022
+**/
+
 #include "bibliothek.h"
 #include <stdio.h>
 #include <conio.h>
@@ -21,56 +27,55 @@ int main()
 
 
 
-    long start = GetTickCount()/1000.0;
-    do{
-    int zero = anzahl_nullen(level);
-    system("cls");                                              // Console leeren
+    long start = GetTickCount()/1000.0;                 //Start der Zeitmesssung
+   
+    do  //Start der Schleife zum möglichen weiterspielen
+    {
+        int zero = anzahl_nullen(level);
+        system("cls");                                              // Console leeren
 
-    level_anzeige(level);
+        level_anzeige(level);
 
-    printf("\n\n");
-    printf("Beenden und Ueberpruefen: ENTER\n");
-    printf("Zahl zuruecksetzen:       0");
+        printf("\n\n");
+        printf("Beenden und Ueberpruefen: ENTER\n");
+        printf("Zahl zuruecksetzen:       0");
 
+        level = Array_ausfuellen_lassen(level);    //play
 
-
-    int ausgefuelltes_Sudoku;
-
-
-    level = Array_ausfuellen_lassen(level);    //play
-
-    system("cls");
+        system("cls");   // Console leeren
 
 
 
+        //Variable, zur überprüfung ob Level gelöst wurde
+        int finish = Ueberpruefung_der_Loesung(level, zero);
 
-    int finish = Ueberpruefung_der_Loesung(level, zero);
-
-    long end = GetTickCount()/1000.0;
+        long end = GetTickCount()/1000.0; //Ende der Zeitmessung
 
 
-    if(finish==0)
-        {
-            printf("\n\n [0]Weiterspielen      [1]Beenden \n");
-            scanf("%i",&exit);
-            if(exit==0)
+        if(finish==0)   //lösung ist nicht richtig
             {
+                printf("\n\n [0]Weiterspielen      [1]Beenden \n");
+                scanf("%i",&exit);
+                if(exit==0)
+                {
 
-                level=weiterspielen(level);
+                    level=weiterspielen(level);   
+                }
+                else
+                {
+                    //level ist nicht gelöst wird aber dennoch beendet
+                    zeit_berechnen(start,end); //Bearbeitungszeit wird berechnet und ausgegeben
+                    exit = 1;   //Endkriterium ist nun erfüllt
+                }
             }
-            else
-            {
-                zeit_berechnen(start,end);
-            }
-        }
-        else
-            {
-            exit = 1;
-            zeit_berechnen(start,end);
-            printf("\n Herzlichen Glueckwunsch, Du hast das Sudoku erfolgreich geloest!");
-            }
+            else    //Lösung ist richtig
+                {
+                exit = 1;   //Endkriterium ist nun erfüllt
+                zeit_berechnen(start,end);     //Bearbeitungszeit wird berechnet und ausgegeben 
+                printf("\n Herzlichen Glueckwunsch, Du hast das Sudoku erfolgreich geloest!");
+                }
     }
-    while(exit == 0 );
+    while(exit == 0 );//Falls weiterspielen erwünscht ist wird die Schleife weiter ausgeführt
 
 
     return 0;
