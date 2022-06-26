@@ -38,7 +38,8 @@ int main()
 
         printf("\n\n");
         printf("Beenden und Ueberpruefen: ENTER\n");
-        printf("Zahl zuruecksetzen:       0");
+        printf("Zahl zuruecksetzen:       0\n");
+        printf("Cursorsteuerung:          Pfeiltasten");
 
         level = Array_ausfuellen_lassen(level);    //play
 
