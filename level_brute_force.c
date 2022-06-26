@@ -3,31 +3,9 @@
 #include <string.h>
 #include <stdbool.h>
 #include <time.h>
+#include "level_brute_force.h"
 
-// Funktionsprototypen
-struct variablen init_variablen();
-struct variablen setup_groups(struct variablen variable, int type_of_group);
-struct variablen define_group(struct variablen variable, int group_number);
-int get_random_number(int number_array[9]);
-struct variablen reset_group(struct variablen variable, int group_number);
-int IsNumberInRow(struct variablen variable, int blockid, int innerrow, int number);
-int IsNumberInCol(struct variablen variable, int blockid, int innercol, int number);
-int ausgabe_felder(struct variablen variable);
-struct variablen niner_fields_to_2d_array(struct variablen variable);
 
-struct variablen {
-    int nine_niner_fields[9][3][3];
-    int numbers[9];
-    int proofrow[9][3];
-    int proofcol[9][3];
-    int reset_count;
-    int max_group_reset;
-    int initial_groups[3];
-    int rest_of_groups[6];
-    int try_counter;
-    int group_reset_result;
-    int two_d_array_of_niner_fields[9][9];
-};
 
 
 struct variablen init_variablen()
@@ -45,6 +23,7 @@ struct variablen init_variablen()
         for (int j=0; j<9; j++)
         {
             variable.two_d_array_of_niner_fields[i][j] = 0;
+            variable.created_level[i][j] = 0;
         }
     }
 
@@ -276,9 +255,7 @@ struct variablen define_group(struct variablen variable, int group_number)
                 {
                     guessed_number = get_random_number(inner_copy_of_numbers);
                 }while (guessed_number == -1);
-                //printf("new guessed number: %i\n", guessed_number);
             }
-            //printf("2");
             // guessed_number wurde eingesetzt, also aus möglichen Nummern streichen (0 einsetzen)
             for (int j=0; j<9; j++)
             {
@@ -290,7 +267,6 @@ struct variablen define_group(struct variablen variable, int group_number)
             }
 
             variable.nine_niner_fields[group_number][row][col] = guessed_number;
-            //printf("group_number: %i; row: %i; col: %i; value: %i\n\n", group_number, row, col, variable.nine_niner_fields[group_number][row][col]);
 
         }
     }
@@ -303,18 +279,7 @@ int get_random_number(int number_array[9])
     bool number_in_available_numbers = false;
     int index_guessed_number = rand() % 9 ;
     int guessed_number = number_array[index_guessed_number];
-    /*
-    printf("number_array[%i]:", index_guessed_number);
-    for (int i=0; i<9; i++)
-    {
-        printf(" %i", number_array[i]);
-    }
-    printf("\n");
-    */
-    //prüfen, ob zufällige Zahl noch in verfügbaren Zahlen (number_array) enthalten ist,
-    //nicht verfügbare Zahlen wurden vorher auf 0 gesetzt
 
-    //printf("number array: %i; guessed: %i\n", number_array[i], guessed_number);
     if (guessed_number != 0)
     {
         number_in_available_numbers = true;
@@ -345,13 +310,11 @@ struct variablen reset_group(struct variablen variable, int group_number)
 
 int IsNumberInRow(struct variablen variable, int blockid, int innerrow, int number)
 {
-    //printf("in number is in row");
     int comparelist[9] = {0};
     int lists[3];
     for (int i=0; i<3; i++)
     {
         lists[i] = variable.proofrow[blockid][i];
-        //printf("lists: %i, innerrwo: %i, i: %i\n", lists[i], innerrow, i);
     }
 
     //comparelist füllen
@@ -367,17 +330,11 @@ int IsNumberInRow(struct variablen variable, int blockid, int innerrow, int numb
     comparelist[7] = variable.nine_niner_fields[lists[2]][innerrow][1];
     comparelist[8] = variable.nine_niner_fields[lists[2]][innerrow][2];
 
-    /*for (int h=0; h<9; h++)
-    {
-        printf("%i, %i\n", comparelist[h], number);
-    }*/
-
     //number in comparelist?
     for (int j=0; j<9; j++)
     {
         if (number == comparelist[j])
         {
-            //printf("number in row\n");
             return 1;
         }
     }
@@ -409,125 +366,29 @@ int IsNumberInCol(struct variablen variable, int blockid, int innercol, int numb
     comparelist[8] = variable.nine_niner_fields[lists[2]][2][innercol];
 
 
-    /*for (int h=0; h<9; h++)
-    {
-        printf("%i, %i\n", comparelist[h], number);
-    }*/
 
     //number in comparelist?
     for (int j=0; j<9; j++)
     {
         if (number == comparelist[j])
         {
-            //printf("number in col\n");
             return 1;
         }
     }
     return 0;
 }
 
-int ausgabe_felder(struct variablen variable)
-{
-    int j;
-    int k;
-    int i;
-
-    printf("--------------------\n");
-
-    for (j=0; j<3;j++)
-    {
-        for (i=0; i<3; i++)
-        {
-            printf("%i ", variable.nine_niner_fields[j][0][i]);
-        }
-    }
-    printf("\n");
-    for (j=0; j<3;j++)
-    {
-        for (i=0; i<3; i++)
-        {
-            printf("%i ", variable.nine_niner_fields[j][1][i]);
-        }
-    }
-    printf("\n");
-    for (j=0; j<3;j++)
-    {
-        for (i=0; i<3; i++)
-        {
-            printf("%i ", variable.nine_niner_fields[j][2][i]);
-        }
-    }
-    printf("\n");
-    printf("--------------------\n");
-
-    for (j=3; j<6;j++)
-    {
-        for (i=0; i<3; i++)
-        {
-            printf("%i ", variable.nine_niner_fields[j][0][i]);
-        }
-    }
-    printf("\n");
-    for (j=3; j<6;j++)
-    {
-        for (i=0; i<3; i++)
-        {
-            printf("%i ", variable.nine_niner_fields[j][1][i]);
-        }
-    }
-    printf("\n");
-    for (j=3; j<6;j++)
-    {
-        for (i=0; i<3; i++)
-        {
-            printf("%i ", variable.nine_niner_fields[j][2][i]);
-        }
-    }
-    printf("\n");
-    printf("--------------------\n");
-
-    for (j=6; j<9;j++)
-    {
-        for (i=0; i<3; i++)
-        {
-            printf("%i ", variable.nine_niner_fields[j][0][i]);
-        }
-    }
-    printf("\n");
-    for (j=6; j<9;j++)
-    {
-        for (i=0; i<3; i++)
-        {
-            printf("%i ", variable.nine_niner_fields[j][1][i]);
-        }
-    }
-    printf("\n");
-    for (j=6; j<9;j++)
-    {
-        for (i=0; i<3; i++)
-        {
-            printf("%i ", variable.nine_niner_fields[j][2][i]);
-        }
-    }
-    printf("\n");
-
-
-
-
-    return 0;
-
-}
 
 
 struct variablen niner_fields_to_2d_array(struct variablen variable)
 {
-    int i, j, k;
+
 
     int *pointer_to_niner_fields;
     int helper_two_d_array[9][9];
     pointer_to_niner_fields = *variable.nine_niner_fields;
     int zaehler_aufbau_fuellen = 0;
-    int counter = 0;
+
     for (int i=0; i<9; i++)
     {
         for (int j=0; j<9; j++)
@@ -535,18 +396,18 @@ struct variablen niner_fields_to_2d_array(struct variablen variable)
             // *result_level ist ein eindimensionales Array mit der Länge 81
             // daher wird zweistelliges Array 9x9 damit befüllt
             helper_two_d_array[i][j] = *(pointer_to_niner_fields + zaehler_aufbau_fuellen);
-            //printf("%d\n", level_aufbau[i][j]);
             zaehler_aufbau_fuellen += 1;
         }
     }
 
 
 
-
+    //Spalten und Zeilen konvertieren
     for (int j=0; j<3; j++)
     {
         variable.two_d_array_of_niner_fields[0][j] = helper_two_d_array[0][j];
     }
+    // Sorry für den Müll
     variable.two_d_array_of_niner_fields[0][3] = helper_two_d_array[1][0];
     variable.two_d_array_of_niner_fields[0][4] = helper_two_d_array[1][1];
     variable.two_d_array_of_niner_fields[0][5] = helper_two_d_array[1][2];
@@ -584,63 +445,101 @@ struct variablen niner_fields_to_2d_array(struct variablen variable)
     variable.two_d_array_of_niner_fields[3][7] = helper_two_d_array[5][1];
     variable.two_d_array_of_niner_fields[3][8] = helper_two_d_array[5][2];
 
-    variable.two_d_array_of_niner_fields[3][0] = helper_two_d_array[3][0];
-    variable.two_d_array_of_niner_fields[3][1] = helper_two_d_array[3][1];
-    variable.two_d_array_of_niner_fields[3][2] = helper_two_d_array[3][2];
-    variable.two_d_array_of_niner_fields[3][3] = helper_two_d_array[4][0];
-    variable.two_d_array_of_niner_fields[3][4] = helper_two_d_array[4][1];
-    variable.two_d_array_of_niner_fields[3][5] = helper_two_d_array[4][2];
-    variable.two_d_array_of_niner_fields[3][6] = helper_two_d_array[5][0];
-    variable.two_d_array_of_niner_fields[3][7] = helper_two_d_array[5][1];
-    variable.two_d_array_of_niner_fields[3][8] = helper_two_d_array[5][2];
+    variable.two_d_array_of_niner_fields[4][0] = helper_two_d_array[3][3];
+    variable.two_d_array_of_niner_fields[4][1] = helper_two_d_array[3][4];
+    variable.two_d_array_of_niner_fields[4][2] = helper_two_d_array[3][5];
+    variable.two_d_array_of_niner_fields[4][3] = helper_two_d_array[4][3];
+    variable.two_d_array_of_niner_fields[4][4] = helper_two_d_array[4][4];
+    variable.two_d_array_of_niner_fields[4][5] = helper_two_d_array[4][5];
+    variable.two_d_array_of_niner_fields[4][6] = helper_two_d_array[5][3];
+    variable.two_d_array_of_niner_fields[4][7] = helper_two_d_array[5][4];
+    variable.two_d_array_of_niner_fields[4][8] = helper_two_d_array[5][5];
+
+    variable.two_d_array_of_niner_fields[5][0] = helper_two_d_array[3][6];
+    variable.two_d_array_of_niner_fields[5][1] = helper_two_d_array[3][7];
+    variable.two_d_array_of_niner_fields[5][2] = helper_two_d_array[3][8];
+    variable.two_d_array_of_niner_fields[5][3] = helper_two_d_array[4][6];
+    variable.two_d_array_of_niner_fields[5][4] = helper_two_d_array[4][7];
+    variable.two_d_array_of_niner_fields[5][5] = helper_two_d_array[4][8];
+    variable.two_d_array_of_niner_fields[5][6] = helper_two_d_array[5][6];
+    variable.two_d_array_of_niner_fields[5][7] = helper_two_d_array[5][7];
+    variable.two_d_array_of_niner_fields[5][8] = helper_two_d_array[5][8];
+
+    variable.two_d_array_of_niner_fields[6][0] = helper_two_d_array[6][0];
+    variable.two_d_array_of_niner_fields[6][1] = helper_two_d_array[6][1];
+    variable.two_d_array_of_niner_fields[6][2] = helper_two_d_array[6][2];
+    variable.two_d_array_of_niner_fields[6][3] = helper_two_d_array[7][0];
+    variable.two_d_array_of_niner_fields[6][4] = helper_two_d_array[7][1];
+    variable.two_d_array_of_niner_fields[6][5] = helper_two_d_array[7][2];
+    variable.two_d_array_of_niner_fields[6][6] = helper_two_d_array[8][0];
+    variable.two_d_array_of_niner_fields[6][7] = helper_two_d_array[8][1];
+    variable.two_d_array_of_niner_fields[6][8] = helper_two_d_array[8][2];
+
+    variable.two_d_array_of_niner_fields[7][0] = helper_two_d_array[6][3];
+    variable.two_d_array_of_niner_fields[7][1] = helper_two_d_array[6][4];
+    variable.two_d_array_of_niner_fields[7][2] = helper_two_d_array[6][5];
+    variable.two_d_array_of_niner_fields[7][3] = helper_two_d_array[7][3];
+    variable.two_d_array_of_niner_fields[7][4] = helper_two_d_array[7][4];
+    variable.two_d_array_of_niner_fields[7][5] = helper_two_d_array[7][5];
+    variable.two_d_array_of_niner_fields[7][6] = helper_two_d_array[8][3];
+    variable.two_d_array_of_niner_fields[7][7] = helper_two_d_array[8][4];
+    variable.two_d_array_of_niner_fields[7][8] = helper_two_d_array[8][5];
+
+    variable.two_d_array_of_niner_fields[8][0] = helper_two_d_array[6][6];
+    variable.two_d_array_of_niner_fields[8][1] = helper_two_d_array[6][7];
+    variable.two_d_array_of_niner_fields[8][2] = helper_two_d_array[6][8];
+    variable.two_d_array_of_niner_fields[8][3] = helper_two_d_array[7][6];
+    variable.two_d_array_of_niner_fields[8][4] = helper_two_d_array[7][7];
+    variable.two_d_array_of_niner_fields[8][5] = helper_two_d_array[7][8];
+    variable.two_d_array_of_niner_fields[8][6] = helper_two_d_array[8][6];
+    variable.two_d_array_of_niner_fields[8][7] = helper_two_d_array[8][7];
+    variable.two_d_array_of_niner_fields[8][8] = helper_two_d_array[8][8];
 
 
 
-    /*for (int i=3; i<6; i++)
-    {
-        for (int j=3; j<6; j++)
-        {
-            variable.two_d_array_of_niner_fields[i][j] = helper_two_d_array[i][j];
-        }
-    }*/
+    return variable;
+}
+
+
+struct variablen create_level(struct variablen variable)
+{
+    int numbers[9] = {1,2,3,4,5,6,7,8,9};
+    int array_index_to_del[9][9];
+    int number_index_x_to_del = 0;
+    int number_index_y_to_del = 0;
+
+    //copy level
     for (int i=0; i<9; i++)
     {
         for (int j=0; j<9; j++)
         {
-            printf("%i ", variable.two_d_array_of_niner_fields[i][j]);
+            variable.created_level[i][j] = variable.two_d_array_of_niner_fields[i][j];
         }
     }
 
 
-
-}
-
-int main()
-{
-    struct variablen variable;
-    srand(time(NULL));
-
-    variable = init_variablen();
-
-    //type group - initial group = 1
-    variable = setup_groups(variable, 1);
-    variable = setup_groups(variable, 0);
-    ausgabe_felder(variable);
-    printf("\n\n");
-    for (int j=0; j<9;j++)
+    for (int i=0; i<9; i++)
     {
-        for (int i=0; i<3; i++)
+        for (int j=0; j<9; j++)
         {
-            for (int h=0; h<3; h++)
-            {
-                printf("%i ", variable.nine_niner_fields[j][i][h]);
-            }
+            array_index_to_del[i][j] = get_random_number(numbers);
         }
     }
-    printf("\n-----------------------\n finished in %i tries", variable.try_counter);
+    for (int i=0; i<6; i++)
+    {
+        for (int j=0; j<9; j++)
+        {
+            number_index_x_to_del = array_index_to_del[i][j];
+            number_index_y_to_del = array_index_to_del[j][i];
+            variable.created_level[number_index_x_to_del][number_index_y_to_del] = 0;
+        }
+    }
 
-    variable = niner_fields_to_2d_array(variable);
 
 
-    return 0;
+    return variable;
+
+
+
 }
+

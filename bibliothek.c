@@ -5,7 +5,7 @@
 #include <windows.h>
 #include <pthread.h>
 #include <time.h>
-
+#include "level_brute_force.h"
 
 /**
 * Thread für Zeitanzeige, wird aufgerufen von Array_ausfuellen_lassen
@@ -54,11 +54,11 @@ int Difficulty()
     printf("\n (1) Einfach");
     printf("\n (2) Normal");
     printf("\n (3) Schwer");
-    printf("\n\n (4) Datei einlesen");
+    printf("\n\n (4) Automatisch erstellen");
 
     while (input_accepted== 0)
     {
-        printf("\n\n zufaelliges Level: ");
+        printf("\n\nSchwierigkeit: ");
 
         scanf("%d", &difficulty_input);
         fflush(stdin);
@@ -72,9 +72,12 @@ int Difficulty()
         {
             difficulty_input = 0;
             input_accepted = 0;
-            printf("\nBitte geben Sie eine Zahl von 1 - 3 ein");
+            printf("\nBitte geben Sie eine Zahl von 1 - 4 ein");
         }
     }
+
+
+
     return 0;
 }
 
@@ -198,6 +201,27 @@ struct Level sudoku_level_initialisition(int choosed_level)
     }
     else if (choosed_level == 4)
     {
+        struct variablen variable; //struct von level_brute_force.h
+        srand(time(NULL)); //Für zufallswerte
+
+        variable = init_variablen(); //Initialisierung der Brute-force-Variablen
+
+        //type group - initial group = 1
+        variable = setup_groups(variable, 1); //3 diagonale, von einander unabhängige neuner Felder ausfüllen lassen
+        variable = setup_groups(variable, 0); //restliche Felder ausfüllen
+        variable = niner_fields_to_2d_array(variable);
+
+        variable = create_level(variable);
+
+        for (int j=0; j<9; j++)
+        {
+            for (int i=0; i<9; i++)
+            {
+                level.loesung[j][i] = variable.two_d_array_of_niner_fields[j][i];
+                level.array_zur_bearbeitung[j][i] = variable.created_level[j][i];
+                level.bearbeitung[j][i] = variable.created_level[j][i];
+            }
+        }
 
     }
     return level;

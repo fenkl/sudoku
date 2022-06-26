@@ -48,6 +48,7 @@ int main()
 
     long end = GetTickCount()/1000.0;
 
+
     if(finish==0)
         {
             printf("\n\n [0]Weiterspielen      [1]Beenden \n");
